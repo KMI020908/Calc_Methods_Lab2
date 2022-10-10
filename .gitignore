@@ -1,7 +1,8 @@
 # Вывод данных
 Tests/**
-GaussSolutions/**
-QRSolutions/**
+SIMPLE_ITERATION_M/**
+JACOBI_M/**
+SEIDEL_M/**
 
 # Константы
 /filePath.h
