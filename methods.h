@@ -6,18 +6,29 @@
 #include"ioData.h"
 #include<iostream>
 
+// Методы
 template<typename Type>
 SOLUTION_FLAG gaussMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, 
-Type accuracy = 1e-14);
+Type accuracy = 1e-7);
 
 template<typename Type>
 SOLUTION_FLAG gaussMethodFull(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, 
-Type accuracy = 1e-14); // Метод Гаусса с полным выбором главного элемента
+Type accuracy = 1e-7); // Метод Гаусса с полным выбором главного элемента
 
 template<typename Type>
 SOLUTION_FLAG qrMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, 
-Type accuracy = 1e-14);
+Type accuracy = 1e-7);
 
+template<typename Type>
+SOLUTION_FLAG simpleItMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy = 1e-7);
+
+template<typename Type>
+SOLUTION_FLAG JacobiMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy = 1e-7);
+
+template<typename Type>
+SOLUTION_FLAG SeidelMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy = 1e-7);
+
+// Вспомогательные функции
 template<typename Type>
 QUADRATIC_FLAG findQMatrix(std::vector<std::vector<Type>> &lCoefs, std::vector<std::vector<Type>> &Q, Type accuracy = 1e-6);
 

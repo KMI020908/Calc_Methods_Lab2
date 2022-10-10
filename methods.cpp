@@ -371,7 +371,7 @@ INVERTIBLE_FLAG invertMatrix(const std::vector<std::vector<Type>> &inputMatrix, 
     SOLUTION_FLAG flag;
     for (std::size_t i = 0; i < rows; i++){
         tempMatrix = inputMatrix;
-        flag = (*method)(tempMatrix, E[i], solution, 1e-14);
+        flag = (*method)(tempMatrix, E[i], solution, 1e-7);
         if (flag == NO_SOLUTION){
             for (std::size_t i = 0; i < rows; i++)
                 resMatrix[i].clear();
@@ -611,4 +611,68 @@ std::ostream& operator<<(std::ostream &os, const std::vector<Type> &vector){
     os << vector[rows - 1] << ' ';
     os << '}';
     return os;
+}
+
+template<typename Type>
+SOLUTION_FLAG simpleItMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NO_SOLUTION;
+
+
+
+
+    return HAS_SOLUTION
+}
+
+template<typename Type>
+SOLUTION_FLAG simpleItMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NO_SOLUTION;
+
+
+
+
+    return HAS_SOLUTION
+}
+
+template<typename Type>
+SOLUTION_FLAG JacobiMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NO_SOLUTION;
+
+
+
+
+    return HAS_SOLUTION
+}
+
+template<typename Type>
+SOLUTION_FLAG SeidelMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NO_SOLUTION;
+
+
+
+
+    return HAS_SOLUTION
 }
