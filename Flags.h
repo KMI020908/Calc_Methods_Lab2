@@ -26,5 +26,10 @@ enum MULTIPLIED_FLAG{
     IS_MULTIPLIED // 1
 };
 
+enum CORRECT_INPUT_FLAG{
+    ERROR, // 0
+    CORRECT // 1
+};
+
 
 #endif 

@@ -395,6 +395,17 @@ Type norm1OfVector(const std::vector<Type> &vector){
 }
 
 template<typename Type>
+Type norm2OfVector(const std::vector<Type> &vector){
+    if (!vector.size())
+        return NAN;
+    Type sum = 0;
+    for (std::size_t i = 0; i < vector.size(); i++){
+        sum += std::pow(vector[i], 2);
+    }
+    return std::sqrt(sum);
+}
+
+template<typename Type>
 Type normInfOfVector(const std::vector<Type> &vector){
     if (!vector.size())
         return NAN;
@@ -403,6 +414,20 @@ Type normInfOfVector(const std::vector<Type> &vector){
         if (std::abs(vector[i]) > max)
             max = std::abs(vector[i]);
     return max;
+}
+
+template<typename Type>
+Type normOfVector(const std::vector<Type> &vector, double p){
+    if (p == 2.0){
+        return norm2OfVector(vector);
+    }
+    if (p == 1.0){
+        return norm1OfVector(vector);
+    }
+    if (p == INFINITY){
+        return normInfOfVector(vector);
+    }
+    return NAN;
 }
 
 template<typename Type>
@@ -614,55 +639,87 @@ std::ostream& operator<<(std::ostream &os, const std::vector<Type> &vector){
 }
 
 template<typename Type>
-SOLUTION_FLAG simpleItMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy){
-    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
-    solution.resize(rows); // Искомое решение
-    std::size_t cols = 0;
-    if (rows != 0)
-        cols = lCoefs[0].size();
-    else
-        return NO_SOLUTION;
-
-
-
-
-    return HAS_SOLUTION
+std::vector<Type> operator+(const std::vector<Type>& vec1, const std::vector<Type>& vec2)
+{
+    auto result = vec1;
+    const std::size_t size_max = std::max<std::size_t>(vec1.size(), vec2.size());
+    result.resize(size_max, 0);
+    for (std::size_t i = 0; i < result.size() && i < vec2.size(); i++){   
+        result[i] += vec2[i];
+    }
+    return result;
 }
 
 template<typename Type>
-SOLUTION_FLAG simpleItMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy){
-    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
-    solution.resize(rows); // Искомое решение
-    std::size_t cols = 0;
-    if (rows != 0)
-        cols = lCoefs[0].size();
-    else
-        return NO_SOLUTION;
-
-
-
-
-    return HAS_SOLUTION
+std::vector<Type> operator-(const std::vector<Type>& vec1, const std::vector<Type>& vec2)
+{
+    auto result = vec1;
+    const std::size_t size_max = std::max<std::size_t>(vec1.size(), vec2.size());
+    result.resize(size_max, 0);
+    for (std::size_t i = 0; i < result.size() && i < vec2.size(); i++){   
+        result[i] -= vec2[i];
+    }
+    return result;
 }
 
 template<typename Type>
-SOLUTION_FLAG JacobiMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy){
-    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
-    solution.resize(rows); // Искомое решение
+std::vector<Type> operator*(const std::vector<std::vector<Type>> &matrix, const std::vector<Type> &vec)
+{
+    std::size_t rows1 = matrix.size();
     std::size_t cols = 0;
-    if (rows != 0)
-        cols = lCoefs[0].size();
+    if (rows1 != 0)
+        cols = matrix[0].size();
     else
-        return NO_SOLUTION;
-
-
-
-
-    return HAS_SOLUTION
+        return std::vector<double>(1, NAN);
+    std::size_t rows2 = vec.size();
+    if (cols != rows2)
+        return std::vector<double>(rows2, NAN);
+    std::vector<Type> result(rows1);
+    for (std::size_t i = 0; i < rows1; i++){
+        Type sum = 0;
+        for (std::size_t k = 0; k < cols; k++){
+            sum += matrix[i][k] * vec[k];
+        }
+        result[i] = sum;
+    }
+    return result;
 }
 
 template<typename Type>
-SOLUTION_FLAG SeidelMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy){
+std::vector<Type> operator*(Type num, const std::vector<Type> &vec){
+    std::size_t size = vec.size();
+    if (!size)
+        return std::vector<double>(1, NAN);
+    std::vector<Type> res(size);
+    for (std::size_t i = 0; i < size; i++){
+        res[i] = num * vec[i];
+    }
+    return res;
+}
+
+template<typename Type>
+std::vector<std::vector<Type>> operator*(Type num, const std::vector<std::vector<Type>> &matrix){
+    std::size_t rows = matrix.size();
+    std::size_t cols = 0;
+    if (!rows)
+        return std::vector<std::vector<Type>>(1, std::vector<Type>(1, NAN));
+    else
+        cols = matrix[0].size();
+    std::vector<std::vector<Type>> res;
+    std::vector<Type> tempVec(cols);
+    for (std::size_t i = 0; i < rows; i++){
+        for (std::size_t j = 0; j < cols; j++)
+        {
+            tempVec[j] = num * matrix[i][j];
+        }
+        res.push_back(tempVec);
+    }
+    return res;
+}
+
+template<typename Type>
+SOLUTION_FLAG simpleItMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type tao, Type accuracy, double p, Type epsilon_0){
     std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
     solution.resize(rows); // Искомое решение
     std::size_t cols = 0;
@@ -670,9 +727,121 @@ SOLUTION_FLAG SeidelMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<T
         cols = lCoefs[0].size();
     else
         return NO_SOLUTION;
+    std::vector<Type> prev_solution = firstVec;
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum = 0.0;
+        for (std::size_t j = 0; j < cols; j++){
+            sum += lCoefs[i][j] * prev_solution[j];
+        }
+        solution[i] = prev_solution[i] + tao * (rCoefs[i] - sum);
+    }
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    int k = 0; //////////////////////////////////
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
+        prev_solution = solution;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum = 0.0;
+            for (std::size_t j = 0; j < cols; j++){
+                sum += lCoefs[i][j] * prev_solution[j];
+            }
+            solution[i] = prev_solution[i] + tao * (rCoefs[i] - sum);
+        }
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
+        k++; /////////////////////////////////
+    }
+    std::cout << k << '\n';
+    return HAS_SOLUTION;
+}
 
+template<typename Type>
+SOLUTION_FLAG JacobiMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, double p, Type epsilon_0){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NO_SOLUTION;
+    std::vector<Type> prev_solution = firstVec;
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum = 0.0;
+        for (std::size_t j = 0; j < cols; j++){
+            if (i != j){
+                sum += lCoefs[i][j] * prev_solution[j];
+            }
+        }
+        solution[i] = (1/lCoefs[i][i]) * (rCoefs[i] - sum);
+    }
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    int k = 0; //////////////////////////////////
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
+        prev_solution = solution;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum = 0.0;
+            for (std::size_t j = 0; j < cols && i != j; j++){
+                if (i != j){
+                    sum += lCoefs[i][j] * prev_solution[j];
+                }
+            }
+            solution[i] = (1/lCoefs[i][i]) * (rCoefs[i] - sum);
+        }   
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
+        k++; /////////////////////////////////
+    }
+    std::cout << k << '\n';
+    return HAS_SOLUTION;
+}
 
-
-
-    return HAS_SOLUTION
+template<typename Type>
+SOLUTION_FLAG relaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, Type omega, double p, Type epsilon_0){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NO_SOLUTION;
+    std::vector<Type> prev_solution = firstVec;
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum1 = 0.0;
+        for (std::size_t j = 0; j < i; j++){
+            sum1 += lCoefs[i][j] * solution[j];
+        }
+        Type sum2 = 0.0;
+        for (std::size_t j = i + 1; j < cols; j++){
+            sum1 += lCoefs[i][j] * solution[j];
+        }
+        solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
+    }
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    int k = 0; //////////////////////////////////
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
+        prev_solution = solution;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum1 = 0.0;
+            for (std::size_t j = 0; j < i; j++){
+                sum1 += lCoefs[i][j] * solution[j];
+            }
+            Type sum2 = 0.0;
+            for (std::size_t j = i + 1; j < cols; j++){
+                sum1 += lCoefs[i][j] * solution[j];
+            }
+            solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
+        }
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
+        k++; /////////////////////////////////
+    }
+    std::cout << k << '\n';
+    return HAS_SOLUTION;
 }

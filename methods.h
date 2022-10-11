@@ -20,13 +20,16 @@ SOLUTION_FLAG qrMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type>
 Type accuracy = 1e-7);
 
 template<typename Type>
-SOLUTION_FLAG simpleItMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy = 1e-7);
+SOLUTION_FLAG simpleItMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, const std::vector<Type> 
+&firstVec, std::vector<Type> &solution, Type tao, Type accuracy = 1e-7, double p = 2.0, Type epsilon_0 = 1e-4);
 
 template<typename Type>
-SOLUTION_FLAG JacobiMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy = 1e-7);
+SOLUTION_FLAG JacobiMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 1e-7, double p = 2.0, Type epsilon_0 = 1e-4);
 
 template<typename Type>
-SOLUTION_FLAG SeidelMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy = 1e-7);
+SOLUTION_FLAG relaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 1e-7, Type omega = 1, double p = 2.0, Type epsilon_0 = 1e-4);
 
 // Вспомогательные функции
 template<typename Type>
@@ -48,7 +51,13 @@ template<typename Type>
 Type findCond_inf(const std::vector<std::vector<Type>> &matrix); // Число обусловленности с кубической метрикой
 
 template<typename Type>
-Type norm1OfVector(const std::vector<Type> &vector); // Октаэдрическая нормам вектора
+Type norm1OfVector(const std::vector<Type> &vector); // Октаэдрическая норма вектора
+
+template<typename Type>
+Type norm2OfVector(const std::vector<Type> &vector); // Квадратичная норма вектора
+
+template<typename Type>
+Type normOfVector(const std::vector<Type> &vector, double p = 2.0);
 
 template<typename Type>
 Type normInfOfVector(const std::vector<Type> &vector); // Кубическая норма вектора
@@ -77,5 +86,17 @@ std::ostream& operator<<(std::ostream &os, const std::vector<std::vector<Type>> 
 
 template<typename Type>
 std::ostream& operator<<(std::ostream &os, const std::vector<Type> &vector);
+
+template<typename Type>
+std::vector<Type> operator+(const std::vector<Type>& vec1, const std::vector<Type>& vec2);
+
+template<typename Type>
+std::vector<Type> operator-(const std::vector<Type>& vec1, const std::vector<Type>& vec2);
+
+template<typename Type>
+std::vector<Type> operator*(const std::vector<std::vector<Type>> &matrix, const std::vector<Type> &vec);
+
+template<typename Type>
+std::vector<Type> operator*(Type num, const std::vector<Type> &vec);
 
 #endif

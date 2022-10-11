@@ -2,6 +2,7 @@
 #include"methods.cpp"
 #include"ioData.cpp"
 #include"filePath.h"
+#include<iomanip>
 
 // Процедура проверки алгоритмов
 template<typename Type>
@@ -20,43 +21,53 @@ void temp_main(){
     std::vector<Type> rCoefSys; // Вектор правых коэффициентов
 
     // Точность 1e-4
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS4, JACOBI_F_PATH_1_EPS4, SEIDEL_F_PATH_1_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS4, JACOBI_F_PATH_1_EPS4, RELAXATION_F_PATH_1_EPS4, 1e-4);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS4, JACOBI_F_PATH_2_EPS4, SEIDEL_F_PATH_2_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS4, JACOBI_F_PATH_2_EPS4, RELAXATION_F_PATH_2_EPS4, 1e-4);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_3, SIMPLE_IT_F_PATH_3_EPS4, JACOBI_F_PATH_3_EPS4, SEIDEL_F_PATH_3_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_3, SIMPLE_IT_F_PATH_3_EPS4, JACOBI_F_PATH_3_EPS4, RELAXATION_F_PATH_3_EPS4, 1e-4);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS4, JACOBI_F_PATH_4_EPS4, SEIDEL_F_PATH_4_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS4, JACOBI_F_PATH_4_EPS4, RELAXATION_F_PATH_4_EPS4, 1e-4);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_5, SIMPLE_IT_F_PATH_5_EPS4, JACOBI_F_PATH_5_EPS4, SEIDEL_F_PATH_5_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_5, SIMPLE_IT_F_PATH_5_EPS4, JACOBI_F_PATH_5_EPS4, RELAXATION_F_PATH_5_EPS4, 1e-4);
 
     generateRandomTest<Type>(4, 1.0, 20.0, IN_FILE_PATH_6);
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_6, SIMPLE_IT_F_PATH_6_EPS4, JACOBI_F_PATH_6_EPS4, SEIDEL_F_PATH_6_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_6, SIMPLE_IT_F_PATH_6_EPS4, JACOBI_F_PATH_6_EPS4, RELAXATION_F_PATH_6_EPS4, 1e-4);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_7, SIMPLE_IT_F_PATH_7_EPS4, JACOBI_F_PATH_7_EPS4, SEIDEL_F_PATH_7_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_7, SIMPLE_IT_F_PATH_7_EPS4, JACOBI_F_PATH_7_EPS4, RELAXATION_F_PATH_7_EPS4, 1e-4);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_8, SIMPLE_IT_F_PATH_8_EPS4, JACOBI_F_PATH_8_EPS4, SEIDEL_F_PATH_8_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_8, SIMPLE_IT_F_PATH_8_EPS4, JACOBI_F_PATH_8_EPS4, RELAXATION_F_PATH_8_EPS4, 1e-4);
 
     // Точность 1e-7
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS7, JACOBI_F_PATH_1_EPS7, SEIDEL_F_PATH_1_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS7, JACOBI_F_PATH_1_EPS7, RELAXATION_F_PATH_1_EPS7, 1e-7);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS7, JACOBI_F_PATH_2_EPS7, SEIDEL_F_PATH_2_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS7, JACOBI_F_PATH_2_EPS7, RELAXATION_F_PATH_2_EPS7, 1e-7);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_3, SIMPLE_IT_F_PATH_3_EPS7, JACOBI_F_PATH_3_EPS7, SEIDEL_F_PATH_3_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_3, SIMPLE_IT_F_PATH_3_EPS7, JACOBI_F_PATH_3_EPS7, RELAXATION_F_PATH_3_EPS7, 1e-7);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS7, JACOBI_F_PATH_4_EPS7, SEIDEL_F_PATH_4_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS7, JACOBI_F_PATH_4_EPS7, RELAXATION_F_PATH_4_EPS7, 1e-7);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_5, SIMPLE_IT_F_PATH_5_EPS7, JACOBI_F_PATH_5_EPS7, SEIDEL_F_PATH_5_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_5, SIMPLE_IT_F_PATH_5_EPS7, JACOBI_F_PATH_5_EPS7, RELAXATION_F_PATH_5_EPS7, 1e-7);
 
     generateRandomTest<Type>(4, 1.0, 20.0, IN_FILE_PATH_6);
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_6, SIMPLE_IT_F_PATH_6_EPS7, JACOBI_F_PATH_6_EPS7, SEIDEL_F_PATH_6_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_6, SIMPLE_IT_F_PATH_6_EPS7, JACOBI_F_PATH_6_EPS7, RELAXATION_F_PATH_6_EPS7, 1e-7);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_7, SIMPLE_IT_F_PATH_7_EPS7, JACOBI_F_PATH_7_EPS7, SEIDEL_F_PATH_7_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_7, SIMPLE_IT_F_PATH_7_EPS7, JACOBI_F_PATH_7_EPS7, RELAXATION_F_PATH_7_EPS7, 1e-7);
 
-    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_8, SIMPLE_IT_F_PATH_8_EPS7, JACOBI_F_PATH_8_EPS7, SEIDEL_F_PATH_8_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, IN_FILE_PATH_8, SIMPLE_IT_F_PATH_8_EPS7, JACOBI_F_PATH_8_EPS7, RELAXATION_F_PATH_8_EPS7, 1e-7);
 }
 
 int main(){
-    temp_main<double>();
+    //temp_main<double>();
+    size_t count = 5;
+    std::vector<std::vector<double>> lCoefs;
+    std::vector<double> rCoefs;
+    readData(lCoefs, rCoefs, IN_FILE_PATH_5);
+    std::size_t rows, cols = lCoefs.size();
+    std::vector<double> solution;
+    std::vector<double> firstVec(rCoefs.size(), -10);
+    double accuracy = 1e-7;
+    relaxationMethod(lCoefs, rCoefs, firstVec, solution, accuracy);
+    std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
     return 0;
 }
