@@ -29,7 +29,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 
 
 template<typename Type>
 SOLUTION_FLAG relaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
-const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 1e-7, Type omega = 1, double p = 2.0, Type epsilon_0 = 1e-4);
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 1e-7, Type omega = 1.0, double p = 2.0, Type epsilon_0 = 1e-4);
 
 template<typename Type>
 SOLUTION_FLAG relaxationMethodFor3Diag(const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> & c, const std::vector<Type> &d, 

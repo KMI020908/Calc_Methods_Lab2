@@ -67,8 +67,6 @@ int main(){
     std::vector<double> solution;
     std::vector<double> firstVec(rCoefs.size(), 0);
     double accuracy = 1e-7;
-    relaxationMethod(lCoefs, rCoefs, firstVec, solution, accuracy);
-    std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
 
     // Большая матрица
     std::vector<double> a, b, c, d;
@@ -87,8 +85,21 @@ int main(){
     }
     d.push_back(9 - 3 * ((n - 1) % 2));
     firstVec.resize(n);
-    relaxationMethodFor3Diag(a, b, c, d, firstVec, solution, accuracy);
+    relaxationMethodFor3Diag(a, b, c, d, firstVec, solution, accuracy, 1.0, INFINITY, 1e-1);
     std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
+
+    std::vector<std::vector<double>> C;
+    std::vector<double> y;
+    findCanonicalFormJacobi(lCoefs, rCoefs, C, y);
+    std::cout << normOfMatrix(C, INFINITY) << '\n';
+    simpleItMethod(lCoefs, rCoefs, firstVec, solution, 0.001, accuracy, INFINITY);
+    std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
+    JacobiMethod(lCoefs, rCoefs, firstVec, solution, accuracy, INFINITY);
+    std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
+    relaxationMethod(lCoefs, rCoefs, firstVec, solution, accuracy, 1.0, INFINITY);
+    std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
+
+    std::cout << C;
     
     return 0;
 }

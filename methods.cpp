@@ -181,7 +181,7 @@ QUADRATIC_FLAG findQMatrix(std::vector<std::vector<Type>> &lCoefs, std::vector<s
     if (rows != 0)
         cols = lCoefs[0].size();
     else
-        return IS_QUADRATIC;
+        return NOT_QUADRATIC;
     if (rows != cols)
         return NOT_QUADRATIC;
     Q.resize(rows);
@@ -867,7 +867,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
 }
 
 template<typename Type>
-SOLUTION_FLAG relaxationMethodFor3Diag(const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> & c, const std::vector<Type> &d, 
+SOLUTION_FLAG relaxationMethodFor3Diag(const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> &c, const std::vector<Type> &d, 
 const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, Type omega, double p, Type epsilon_0){
     if (!b.size() || b.size() != d.size() || a.size() != b.size() - 1 || c.size() != a.size())
         return NO_SOLUTION;
@@ -898,4 +898,97 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
     }
     std::cout << k << '\n';
     return HAS_SOLUTION;
+}
+
+// x = C * x + y 
+template<typename Type>
+QUADRATIC_FLAG findCanonicalFormSimpleIt(const std::vector<std::vector<Type>> &lCoefs, 
+const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y, Type tao){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NOT_QUADRATIC;
+    if (rows != cols)
+        return NOT_QUADRATIC;
+    cols = rCoefs.size();
+    if (rows != cols)
+        return NOT_QUADRATIC;
+    C.resize(rows);
+    for (std::size_t i = 0; i < rows; i++){
+        C[i].resize(cols, 0);
+    } 
+    y.resize(cols, 0);
+    for (std::size_t i = 0; i < rows; i++){
+        for (std::size_t j = 0; j < cols; j++){
+            if (i != j){
+                C[i][j] = -tao * lCoefs[i][j];
+            }
+            else{
+                C[i][j] = -tao * lCoefs[i][j] + 1;
+            }
+        }
+    }
+    for (std::size_t j = 0; j < cols; j++){
+        y[j] = tao * rCoefs[j];
+    }
+    return IS_QUADRATIC;
+}
+
+template<typename Type>
+QUADRATIC_FLAG findCanonicalFormJacobi(const std::vector<std::vector<Type>> &lCoefs, 
+const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NOT_QUADRATIC;
+    if (rows != cols)
+        return NOT_QUADRATIC;
+    cols = rCoefs.size();
+    if (rows != cols)
+        return NOT_QUADRATIC;
+    C.resize(rows);
+    for (std::size_t i = 0; i < rows; i++){
+        C[i].resize(cols, 0);
+    } 
+    y.resize(cols, 0);
+    for (std::size_t i = 0; i < rows; i++){
+        for (std::size_t j = 0; j < cols; j++){
+            if (i != j){
+                C[i][j] = -lCoefs[i][j] / lCoefs[i][i];
+            }
+            else{
+                C[i][j] = 0.0;
+            }
+        }
+    }
+    for (std::size_t j = 0; j < cols; j++){
+        y[j] = rCoefs[j] / lCoefs[j][j];
+    }
+    return IS_QUADRATIC;
+}
+
+template<typename Type>
+QUADRATIC_FLAG findCanonicalFormRelaxation(const std::vector<std::vector<Type>> &lCoefs, 
+const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NOT_QUADRATIC;
+    if (rows != cols)
+        return NOT_QUADRATIC;
+    cols = rCoefs.size();
+    if (rows != cols)
+        return NOT_QUADRATIC;
+    C.resize(rows);
+    for (std::size_t i = 0; i < rows; i++){
+        C[i].resize(cols, 0);
+    } 
+    y.resize(cols, 0);
+    return IS_QUADRATIC;
 }
