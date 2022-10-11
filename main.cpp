@@ -62,12 +62,33 @@ int main(){
     size_t count = 5;
     std::vector<std::vector<double>> lCoefs;
     std::vector<double> rCoefs;
-    readData(lCoefs, rCoefs, IN_FILE_PATH_5);
+    readData(lCoefs, rCoefs, IN_FILE_PATH_1);
     std::size_t rows, cols = lCoefs.size();
     std::vector<double> solution;
-    std::vector<double> firstVec(rCoefs.size(), -10);
+    std::vector<double> firstVec(rCoefs.size(), 0);
     double accuracy = 1e-7;
     relaxationMethod(lCoefs, rCoefs, firstVec, solution, accuracy);
     std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
+
+    // Большая матрица
+    std::vector<double> a, b, c, d;
+    std::size_t N = 9;
+    std::size_t n = 200 + N;
+    for (std::size_t i = 0; i < n - 1; i++){
+        a.push_back(1);
+        c.push_back(1);
+    }
+    for (std::size_t i = 0; i < n; i++){
+        b.push_back(4);
+    }
+    d.push_back(6);
+    for (std::size_t i = 1; i < n - 1; i++){
+        d.push_back(10 - 2 * (i % 2));
+    }
+    d.push_back(9 - 3 * ((n - 1) % 2));
+    firstVec.resize(n);
+    relaxationMethodFor3Diag(a, b, c, d, firstVec, solution, accuracy);
+    std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
+    
     return 0;
 }

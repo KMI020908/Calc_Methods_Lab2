@@ -325,6 +325,23 @@ Type findMatrixNormInf(const std::vector<std::vector<Type>> &matrix){
 }
 
 template<typename Type>
+Type normOfMatrix(const std::vector<std::vector<Type>> &matrix, double p){
+    std::size_t rows = matrix.size(); // Количество строк в СЛАУ
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = matrix[0].size();
+    else
+        return NAN;
+    if (p == 1.0){
+        return findMatrixNorm1(matrix);
+    }
+    if (p == INFINITY){
+        return findMatrixNormInf(matrix);
+    }
+    return NAN;
+}
+
+template<typename Type>
 Type findCond_inf(const std::vector<std::vector<Type>> &matrix){
     std::size_t rows = matrix.size(); // Количество строк в СЛАУ
     std::size_t cols = 0;
@@ -418,6 +435,9 @@ Type normInfOfVector(const std::vector<Type> &vector){
 
 template<typename Type>
 Type normOfVector(const std::vector<Type> &vector, double p){
+    if (!vector.size()){
+        return NAN;
+    }
     if (p == 2.0){
         return norm2OfVector(vector);
     }
@@ -841,6 +861,40 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
         diffNorm = normOfVector(diffVec, p);
         //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
         k++; /////////////////////////////////
+    }
+    std::cout << k << '\n';
+    return HAS_SOLUTION;
+}
+
+template<typename Type>
+SOLUTION_FLAG relaxationMethodFor3Diag(const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> & c, const std::vector<Type> &d, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, Type omega, double p, Type epsilon_0){
+    if (!b.size() || b.size() != d.size() || a.size() != b.size() - 1 || c.size() != a.size())
+        return NO_SOLUTION;
+    std::size_t dim = b.size();
+    solution.resize(dim); // Искомое решение
+    std::vector<Type> prev_solution = firstVec;
+    solution[0] = (1 - omega) * prev_solution[0] - (omega / b[0]) * (c[0] * prev_solution[1] - d[0]);
+    for (std::size_t i = 1; i < dim - 1; i++){    
+        solution[i] = (1 - omega) * prev_solution[i] - (omega / b[i]) * (a[i - 1] * solution[i - 1] + c[i] * prev_solution[i + 1] - d[i]);
+    }
+    solution[dim - 1] = (1 - omega) * prev_solution[dim - 1] - (omega / b[dim - 1]) * (a[dim - 2] * prev_solution[dim - 2] - d[dim - 1]);
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    int k = 0; //////////////////////////////////
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
+        prev_solution = solution;
+        solution[0] = (1 - omega) * prev_solution[0] - (omega / b[0]) * (c[0] * prev_solution[1] - d[0]);
+        for (std::size_t i = 1; i < dim - 1; i++){    
+            solution[i] = (1 - omega) * prev_solution[i] - (omega / b[i]) * (a[i - 1] * solution[i - 1] + c[i] * prev_solution[i + 1] - d[i]);
+        }
+        solution[dim - 1] = (1 - omega) * prev_solution[dim - 1] - (omega / b[dim - 1]) * (a[dim - 2] * prev_solution[dim - 2] - d[dim - 1]);
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
+        k++; /////////////////////////////////
+        if (k == 1000000)
+            break;
     }
     std::cout << k << '\n';
     return HAS_SOLUTION;

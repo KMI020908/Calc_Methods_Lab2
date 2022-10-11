@@ -31,6 +31,10 @@ template<typename Type>
 SOLUTION_FLAG relaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
 const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 1e-7, Type omega = 1, double p = 2.0, Type epsilon_0 = 1e-4);
 
+template<typename Type>
+SOLUTION_FLAG relaxationMethodFor3Diag(const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> & c, const std::vector<Type> &d, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy  = 1e-7, Type omega = 1, double p = 2.0, Type epsilon_0 = 1e-4);
+
 // Вспомогательные функции
 template<typename Type>
 QUADRATIC_FLAG findQMatrix(std::vector<std::vector<Type>> &lCoefs, std::vector<std::vector<Type>> &Q, Type accuracy = 1e-6);
@@ -46,6 +50,9 @@ Type findCond_1(const std::vector<std::vector<Type>> &matrix); // Число о�
 
 template<typename Type>
 Type findMatrixNormInf(const std::vector<std::vector<Type>> &matrix); // Кубическая норма матрицы
+
+template<typename Type>
+Type normOfMatrix(const std::vector<std::vector<Type>> &matrix, double p = 1.0); 
 
 template<typename Type>
 Type findCond_inf(const std::vector<std::vector<Type>> &matrix); // Число обусловленности с кубической метрикой
@@ -81,6 +88,7 @@ MULTIPLIED_FLAG multiplyMatrix(const std::vector<std::vector<Type>> &matrix1, co
 template<typename Type>
 MULTIPLIED_FLAG multiplyMatrix(const std::vector<std::vector<Type>> &matrix, const std::vector<Type> &vec, std::vector<Type> &result);
 
+// Перегрузки
 template<typename Type>
 std::ostream& operator<<(std::ostream &os, const std::vector<std::vector<Type>> &matrix);
 
