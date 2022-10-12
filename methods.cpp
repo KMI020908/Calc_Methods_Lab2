@@ -771,6 +771,8 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type tao, Type a
         diffNorm = normOfVector(diffVec, p);
         //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
         k++; /////////////////////////////////
+        if (k == 2000000)
+            break;
     }
     std::cout << k << '\n';
     return HAS_SOLUTION;
@@ -799,11 +801,11 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, d
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     int k = 0; //////////////////////////////////
-    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum = 0.0;
-            for (std::size_t j = 0; j < cols && i != j; j++){
+            for (std::size_t j = 0; j < cols; j++){
                 if (i != j){
                     sum += lCoefs[i][j] * prev_solution[j];
                 }
@@ -812,7 +814,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, d
         }   
         diffVec = solution - prev_solution;
         diffNorm = normOfVector(diffVec, p);
-        //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
+        std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
         k++; /////////////////////////////////
     }
     std::cout << k << '\n';
@@ -837,7 +839,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
         }
         Type sum2 = 0.0;
         for (std::size_t j = i + 1; j < cols; j++){
-            sum1 += lCoefs[i][j] * solution[j];
+            sum2 += lCoefs[i][j] * solution[j];
         }
         solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
     }
@@ -853,7 +855,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
             }
             Type sum2 = 0.0;
             for (std::size_t j = i + 1; j < cols; j++){
-                sum1 += lCoefs[i][j] * solution[j];
+                sum2 += lCoefs[i][j] * solution[j];
             }
             solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
         }

@@ -62,7 +62,7 @@ int main(){
     size_t count = 5;
     std::vector<std::vector<double>> lCoefs;
     std::vector<double> rCoefs;
-    readData(lCoefs, rCoefs, IN_FILE_PATH_1);
+    readData(lCoefs, rCoefs, IN_FILE_PATH_2);
     std::size_t rows, cols = lCoefs.size();
     std::vector<double> solution;
     std::vector<double> firstVec(rCoefs.size(), 0);
@@ -90,16 +90,17 @@ int main(){
 
     std::vector<std::vector<double>> C;
     std::vector<double> y;
+    firstVec.resize(4);
     findCanonicalFormJacobi(lCoefs, rCoefs, C, y);
     std::cout << normOfMatrix(C, INFINITY) << '\n';
-    simpleItMethod(lCoefs, rCoefs, firstVec, solution, 0.001, accuracy, INFINITY);
+    simpleItMethod(lCoefs, rCoefs, firstVec, solution, 1e-8, accuracy, INFINITY);
     std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
     JacobiMethod(lCoefs, rCoefs, firstVec, solution, accuracy, INFINITY);
     std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
     relaxationMethod(lCoefs, rCoefs, firstVec, solution, accuracy, 1.0, INFINITY);
     std::cout << std::setprecision(std::abs(std::log10(accuracy))) << solution << '\n';
 
-    std::cout << C;
+    //std::cout << C;
     
     return 0;
 }
