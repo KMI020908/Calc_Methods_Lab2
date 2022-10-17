@@ -738,15 +738,15 @@ std::vector<std::vector<Type>> operator*(Type num, const std::vector<std::vector
 }
 
 template<typename Type>
-SOLUTION_FLAG simpleItMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
-const std::vector<Type> &firstVec, std::vector<Type> &solution, Type tao, Type accuracy, double p, Type epsilon_0){
+std::size_t simpleItMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type tao, Type accuracy, double p, Type epsilon_0, std::size_t stopIt){
     std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
     solution.resize(rows); // Искомое решение
     std::size_t cols = 0;
     if (rows != 0)
         cols = lCoefs[0].size();
     else
-        return NO_SOLUTION;
+        return 0;
     std::vector<Type> prev_solution = firstVec;
     for (std::size_t i = 0; i < rows; i++){
         Type sum = 0.0;
@@ -757,7 +757,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type tao, Type a
     }
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
-    int k = 0; //////////////////////////////////
+    std::size_t numOfIt = 1;
     while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
@@ -769,25 +769,23 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type tao, Type a
         }
         diffVec = solution - prev_solution;
         diffNorm = normOfVector(diffVec, p);
-        //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
-        k++; /////////////////////////////////
-        if (k == 2000000)
+        if (numOfIt == stopIt)
             break;
+        numOfIt++;
     }
-    std::cout << k << '\n';
-    return HAS_SOLUTION;
+    return numOfIt;
 }
 
 template<typename Type>
-SOLUTION_FLAG JacobiMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
-const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, double p, Type epsilon_0){
+std::size_t JacobiMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, double p, Type epsilon_0, std::size_t stopIt){
     std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
     solution.resize(rows); // Искомое решение
     std::size_t cols = 0;
     if (rows != 0)
         cols = lCoefs[0].size();
     else
-        return NO_SOLUTION;
+        return 0;
     std::vector<Type> prev_solution = firstVec;
     for (std::size_t i = 0; i < rows; i++){
         Type sum = 0.0;
@@ -800,7 +798,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, d
     }
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
-    int k = 0; //////////////////////////////////
+    std::size_t numOfIt = 1;
     while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
@@ -814,23 +812,23 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, d
         }   
         diffVec = solution - prev_solution;
         diffNorm = normOfVector(diffVec, p);
-        std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
-        k++; /////////////////////////////////
+        if (numOfIt == stopIt)
+            break;
+        numOfIt++;
     }
-    std::cout << k << '\n';
-    return HAS_SOLUTION;
+    return numOfIt;
 }
 
 template<typename Type>
-SOLUTION_FLAG relaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
-const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, Type omega, double p, Type epsilon_0){
+std::size_t relaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, Type omega, double p, Type epsilon_0, std::size_t stopIt){
     std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
     solution.resize(rows); // Искомое решение
     std::size_t cols = 0;
     if (rows != 0)
         cols = lCoefs[0].size();
     else
-        return NO_SOLUTION;
+        return 0;
     std::vector<Type> prev_solution = firstVec;
     for (std::size_t i = 0; i < rows; i++){
         Type sum1 = 0.0;
@@ -845,8 +843,8 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
     }
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
-    int k = 0; //////////////////////////////////
-    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
+    std::size_t numOfIt = 1;
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum1 = 0.0;
@@ -861,16 +859,17 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
         }
         diffVec = solution - prev_solution;
         diffNorm = normOfVector(diffVec, p);
-        //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
-        k++; /////////////////////////////////
+        if (numOfIt == stopIt){
+            break;
+        }
+        numOfIt++;
     }
-    std::cout << k << '\n';
-    return HAS_SOLUTION;
+    return numOfIt;
 }
 
 template<typename Type>
-SOLUTION_FLAG relaxationMethodFor3Diag(const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> &c, const std::vector<Type> &d, 
-const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, Type omega, double p, Type epsilon_0){
+std::size_t relaxationMethodFor3Diag(const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> &c, const std::vector<Type> &d, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, Type omega, double p, Type epsilon_0, std::size_t stopIt){
     if (!b.size() || b.size() != d.size() || a.size() != b.size() - 1 || c.size() != a.size())
         return NO_SOLUTION;
     std::size_t dim = b.size();
@@ -883,8 +882,8 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
     solution[dim - 1] = (1 - omega) * prev_solution[dim - 1] - (omega / b[dim - 1]) * (a[dim - 2] * prev_solution[dim - 2] - d[dim - 1]);
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
-    int k = 0; //////////////////////////////////
-    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
+    std::size_t numOfIt = 1;
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
         prev_solution = solution;
         solution[0] = (1 - omega) * prev_solution[0] - (omega / b[0]) * (c[0] * prev_solution[1] - d[0]);
         for (std::size_t i = 1; i < dim - 1; i++){    
@@ -893,13 +892,11 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
         solution[dim - 1] = (1 - omega) * prev_solution[dim - 1] - (omega / b[dim - 1]) * (a[dim - 2] * prev_solution[dim - 2] - d[dim - 1]);
         diffVec = solution - prev_solution;
         diffNorm = normOfVector(diffVec, p);
-        //std::cout << (diffNorm) / (normOfVector(prev_solution, p) + epsilon_0) << ' ' << diffNorm << '\n';
-        k++; /////////////////////////////////
-        if (k == 1000000)
+        if (numOfIt == stopIt)
             break;
+        numOfIt++;
     }
-    std::cout << k << '\n';
-    return HAS_SOLUTION;
+    return numOfIt;
 }
 
 // x = C * x + y 

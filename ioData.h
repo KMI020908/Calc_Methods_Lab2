@@ -15,7 +15,15 @@ template<typename Type>
 FILE_FLAG readData(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs,  const std::string& IN_FILE_PATH);
 
 template<typename Type>
-FILE_FLAG writeData(const std::vector<Type> &solution, const std::string& OUT_FILE_PATH, SOLUTION_FLAG FLAG = HAS_SOLUTION);
+FILE_FLAG writeData(const std::vector<Type> &solution, const std::vector<Type> &startPoint, Type accuracy, const std::string& OUT_FILE_PATH, std::size_t numOfIt, 
+Type tao = 0.0, Type omega = 0.0);
+
+template<typename Type>
+FILE_FLAG addData(const std::vector<Type> &solution, const std::vector<Type> &startPoint, Type accuracy, const std::string& OUT_FILE_PATH, std::size_t numOfIt, 
+Type tao = 0.0, Type omega = 0.0);
+
+template<typename Type>
+FILE_FLAG writeCanonicalForm(const std::vector<std::vector<Type>> &C, const std::vector<Type> &y, const std::string& OUT_FILE_PATH);
 
 template<typename Type>
 FILE_FLAG writeQRMatrix(const std::vector<std::vector<Type>> &Q, const std::vector<std::vector<Type>> &R, const std::string& OUT_FILE_PATH);
@@ -35,5 +43,17 @@ FILE_FLAG writeConds(Type cond_1, Type cond_inf, const std::string& OUT_FILE_PAT
 
 template<typename Type>
 FILE_FLAG writeLowerBounds(Type lowerBound1, Type lowerBoundInf, const std::string& OUT_FILE_PATH);
+
+template<typename Type>
+FILE_FLAG writePointsOfSimpleItMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, const std::vector<Type> 
+&firstVec, std::vector<Type> &solution, Type tao, const std::string& OUT_FILE_PATH, Type accuracy = 1e-7, double p = 2.0, Type epsilon_0 = 1e-4);
+
+template<typename Type>
+FILE_FLAG writePointsOfJacobiMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, const std::string& OUT_FILE_PATH, Type accuracy = 1e-7, double p = 2.0, Type epsilon_0 = 1e-4);
+
+template<typename Type>
+FILE_FLAG writePointsOfRelaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution,  const std::string& OUT_FILE_PATH, Type accuracy = 1e-7, Type omega = 1.0, double p = 2.0, Type epsilon_0 = 1e-4);
 
 #endif

@@ -1,8 +1,8 @@
 # Вывод данных
+pointsOf2DSys/**
 Tests/**
-SIMPLE_ITERATION_M/**
-JACOBI_M/**
-SEIDEL_M/**
+eps4/**
+eps7/**
 
 # Константы
 /filePath.h
@@ -10,3 +10,4 @@ SEIDEL_M/**
 # Системные файлы
 .vscode/**
 *.exe
+*.nb
