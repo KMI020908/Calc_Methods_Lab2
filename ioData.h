@@ -23,6 +23,9 @@ FILE_FLAG addData(const std::vector<Type> &solution, const std::vector<Type> &st
 Type tao = 0.0, Type omega = 0.0);
 
 template<typename Type>
+FILE_FLAG writeBoundOfIterations(Type bound, const std::string& OUT_FILE_PATH);
+
+template<typename Type>
 FILE_FLAG writeCanonicalForm(const std::vector<std::vector<Type>> &C, const std::vector<Type> &y, const std::string& OUT_FILE_PATH);
 
 template<typename Type>

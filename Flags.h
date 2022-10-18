@@ -31,5 +31,11 @@ enum CORRECT_INPUT_FLAG{
     CORRECT // 1
 };
 
+enum ITERATION_METHOD_FLAG{
+    SIMPLE_IT, // 0
+    JACOBI, // 1
+    RELAXATION // 2
+};
+
 
 #endif 

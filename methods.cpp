@@ -991,3 +991,63 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
     y.resize(cols, 0);
     return IS_QUADRATIC;
 }
+
+template<typename Type>
+Type findLowerBoundOfIterations(const std::vector<std::vector<Type>> &lCoefs, 
+const std::vector<Type> &rCoefs, const std::vector<Type> &firstVec, Type accuracy, ITERATION_METHOD_FLAG method, Type tao, Type omega, double p){
+    std::size_t rows = lCoefs.size();
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return 0.0;
+    std::vector<Type> prev_solution = firstVec;
+    std::vector<Type> solution(rows);
+    std::vector<std::vector<Type>> C;
+    std::vector<Type> y;
+    switch (method){
+        case SIMPLE_IT:
+            for (std::size_t i = 0; i < rows; i++){
+                Type sum = 0.0;
+                for (std::size_t j = 0; j < cols; j++){
+                    sum += lCoefs[i][j] * prev_solution[j];
+                }
+                solution[i] = prev_solution[i] + tao * (rCoefs[i] - sum);
+            }
+            findCanonicalFormSimpleIt(lCoefs, rCoefs, C, y, tao);
+            break;
+
+        case JACOBI:
+            for (std::size_t i = 0; i < rows; i++){
+                    Type sum = 0.0;
+                    for (std::size_t j = 0; j < cols; j++){
+                        if (i != j){
+                        sum += lCoefs[i][j] * prev_solution[j];
+                        }
+                    }
+                solution[i] = (1/lCoefs[i][i]) * (rCoefs[i] - sum);
+            }
+            findCanonicalFormJacobi(lCoefs, rCoefs, C, y);
+            break;
+
+        case RELAXATION:
+            for (std::size_t i = 0; i < rows; i++){
+                Type sum1 = 0.0;
+                for (std::size_t j = 0; j < i; j++){
+                    sum1 += lCoefs[i][j] * solution[j];
+                }
+                Type sum2 = 0.0;
+                for (std::size_t j = i + 1; j < cols; j++){
+                    sum2 += lCoefs[i][j] * solution[j];
+                }
+                solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
+            }
+            findCanonicalFormRelaxation(lCoefs, rCoefs, C, y); /////////////////////////////////////////////////
+            break;
+            default:
+                break;
+    }
+    Type distance = normOfVector(solution - prev_solution, p);
+    Type q = normOfMatrix(C, p);
+    return std::log(accuracy * (1 - q) / distance) / std::log(q);
+}

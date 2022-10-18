@@ -100,6 +100,18 @@ Type tao, Type omega){
 }
 
 template<typename Type>
+FILE_FLAG writeBoundOfIterations(Type bound, const std::string& OUT_FILE_PATH){
+    std::ofstream file;
+	file.open(OUT_FILE_PATH, std::ios::app);
+	if (!file.is_open())
+		exit(NOT_OPEN);
+    file << '\n';
+    file << "Number of iterations > " << bound;
+    file.close();
+    return IS_CLOSED;
+}
+
+template<typename Type>
 FILE_FLAG writeCanonicalForm(const std::vector<std::vector<Type>> &C, const std::vector<Type> &y, const std::string& OUT_FILE_PATH){
     std::ofstream file;
 	file.open(OUT_FILE_PATH, std::ios::app);

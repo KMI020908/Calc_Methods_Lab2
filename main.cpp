@@ -22,28 +22,39 @@ Type accuracy = 1e-7){
     Type omega = 0.0;
     double p = INFINITY;
     Type eps0 = 1e-8;
+    Type bound = 0.0;
+    ITERATION_METHOD_FLAG method;
 
     // Метод простой итерации
+    method = SIMPLE_IT;
     tao = 1e-4;
     numOfIt = simpleItMethod(lCoefSys, rCoefSys, startPoint, solution, tao, accuracy, p, eps0, 10000000);
     writeData(solution, startPoint, accuracy, SIMPLE_IT_F_PATH, numOfIt, tao, 0.0);
+    bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
+    writeBoundOfIterations(bound, SIMPLE_IT_F_PATH);
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, SIMPLE_IT_F_PATH);
     findCanonicalFormSimpleIt(lCoefSys, rCoefSys, C, y, tao);
     writeCanonicalForm(C, y, SIMPLE_IT_F_PATH);
 
     // Метод Якоби
+    method = JACOBI;
     numOfIt = JacobiMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, p, eps0);
     writeData(solution, startPoint, accuracy, JACOBI_F_PATH, numOfIt);
+    bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
+    writeBoundOfIterations(bound, JACOBI_F_PATH);
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, JACOBI_F_PATH);
     findCanonicalFormJacobi(lCoefSys, rCoefSys, C, y);
     writeCanonicalForm(C, y, JACOBI_F_PATH);
 
     // Метод Релаксации (Зейделя в случае омега равной 1)
+    method = RELAXATION;
     omega = 1.0;
     numOfIt = relaxationMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, omega, p, eps0);
     writeData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
+    bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
+    writeBoundOfIterations(bound, RELAXATION_F_PATH);
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, RELAXATION_F_PATH);
     omega = 1.25;
