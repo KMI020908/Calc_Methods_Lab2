@@ -24,11 +24,11 @@ Type accuracy = 1e-7){
     Type eps0 = 1e-8;
     Type bound = 0.0;
     ITERATION_METHOD_FLAG method;
-
+    /*
     // Метод простой итерации
     method = SIMPLE_IT;
     tao = 1e-4;
-    numOfIt = simpleItMethod(lCoefSys, rCoefSys, startPoint, solution, tao, accuracy, p, eps0, 10000000);
+    numOfIt = simpleItMethod(lCoefSys, rCoefSys, startPoint, solution, tao, accuracy, p, eps0, 100000000);
     writeData(solution, startPoint, accuracy, SIMPLE_IT_F_PATH, numOfIt, tao, 0.0);
     bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
     writeBoundOfIterations(bound, SIMPLE_IT_F_PATH);
@@ -36,7 +36,7 @@ Type accuracy = 1e-7){
     writeResidual(residual, SIMPLE_IT_F_PATH);
     findCanonicalFormSimpleIt(lCoefSys, rCoefSys, C, y, tao);
     writeCanonicalForm(C, y, SIMPLE_IT_F_PATH);
-
+*/
     // Метод Якоби
     method = JACOBI;
     numOfIt = JacobiMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, p, eps0);
@@ -57,13 +57,17 @@ Type accuracy = 1e-7){
     writeBoundOfIterations(bound, RELAXATION_F_PATH);
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, RELAXATION_F_PATH);
+    findCanonicalFormRelaxation(lCoefSys, rCoefSys, C, y, omega);
+    writeCanonicalForm(C, y, RELAXATION_F_PATH);
     omega = 1.25;
     numOfIt = relaxationMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, omega, p, eps0);
     addData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
+    bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
+    writeBoundOfIterations(bound, RELAXATION_F_PATH);
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, RELAXATION_F_PATH);
-    //findCanonicalFormSimpleIt(lCoefSys, rCoefSys, C, y, tao);
-    //writeCanonicalForm(C, y, SIMPLE_IT_F_PATH);
+    findCanonicalFormRelaxation(lCoefSys, rCoefSys, C, y, omega);
+    writeCanonicalForm(C, y, RELAXATION_F_PATH);
 
 }
 
@@ -75,18 +79,18 @@ void temp_main(){
     std::vector<Type> startPoint = {0.0, 0.0, 0.0, 0.0};
 
     // Точность 1e-4
-    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS4, JACOBI_F_PATH_1_EPS4, RELAXATION_F_PATH_1_EPS4, 1e-4);
+    //checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS4, JACOBI_F_PATH_1_EPS4, RELAXATION_F_PATH_1_EPS4, 1e-4);
 
-    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS4, JACOBI_F_PATH_2_EPS4, RELAXATION_F_PATH_2_EPS4, 1e-4);
+    //checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS4, JACOBI_F_PATH_2_EPS4, RELAXATION_F_PATH_2_EPS4, 1e-4);
 
     checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS4, JACOBI_F_PATH_4_EPS4, RELAXATION_F_PATH_4_EPS4, 1e-4);
 
     checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_5, SIMPLE_IT_F_PATH_5_EPS4, JACOBI_F_PATH_5_EPS4, RELAXATION_F_PATH_5_EPS4, 1e-4);
 
     // Точность 1e-7
-    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS7, JACOBI_F_PATH_1_EPS7, RELAXATION_F_PATH_1_EPS7, 1e-7);
+    //checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS7, JACOBI_F_PATH_1_EPS7, RELAXATION_F_PATH_1_EPS7, 1e-7);
 
-    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS7, JACOBI_F_PATH_2_EPS7, RELAXATION_F_PATH_2_EPS7, 1e-7);
+    //checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS7, JACOBI_F_PATH_2_EPS7, RELAXATION_F_PATH_2_EPS7, 1e-7);
 
     checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS7, JACOBI_F_PATH_4_EPS7, RELAXATION_F_PATH_4_EPS7, 1e-7);
 
@@ -101,10 +105,10 @@ int main(){
     std::vector<double> f;
     std::vector<double> solution;
     readData(A, f, IN_FILE_PATH_3);
-    std::vector<double> fVec = {3, 0.25};
+    std::vector<double> fVec = {3.5, 0.5};
     writePointsOfJacobiMethod(A, f, fVec, solution, JACOBI_POINTS_FILE_PATH);
     writePointsOfRelaxationMethod(A, f, fVec, solution, ZEIDEL_POINTS_FILE_PATH);
-    writePointsOfRelaxationMethod(A, f, fVec, solution, RELAXATION_POINTS_FILE_PATH, 1e-7, 1.5);
+    writePointsOfRelaxationMethod(A, f, fVec, solution, RELAXATION_POINTS_FILE_PATH, 1e-7, 1.9);
 
     // Большая матрица
     std::vector<double> a, b, c, d;
@@ -126,6 +130,6 @@ int main(){
     double accuracy = 1e-7;
     relaxationMethodFor3Diag(a, b, c, d, firstVec, solution, accuracy, 1.0, INFINITY, 1e-4);
     std::cout << solution << '\n';
-    
+
     return 0;
 }

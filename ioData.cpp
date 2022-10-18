@@ -293,6 +293,7 @@ FILE_FLAG writePointsOfSimpleItMethod(const std::vector<std::vector<Type>> &lCoe
         return IS_CLOSED;
     }
     std::vector<Type> prev_solution = firstVec;
+    solution = prev_solution;
     file << prev_solution << '\n';
     for (std::size_t i = 0; i < rows; i++){
         Type sum = 0.0;
@@ -300,8 +301,8 @@ FILE_FLAG writePointsOfSimpleItMethod(const std::vector<std::vector<Type>> &lCoe
             sum += lCoefs[i][j] * prev_solution[j];
         }
         solution[i] = prev_solution[i] + tao * (rCoefs[i] - sum);
+        file << solution << '\n';
     }
-    file << solution << '\n';
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
@@ -312,8 +313,8 @@ FILE_FLAG writePointsOfSimpleItMethod(const std::vector<std::vector<Type>> &lCoe
                 sum += lCoefs[i][j] * prev_solution[j];
             }
             solution[i] = prev_solution[i] + tao * (rCoefs[i] - sum);
+            file << solution << '\n';
         }
-        file << solution << '\n';
         diffVec = solution - prev_solution;
         diffNorm = normOfVector(diffVec, p);
     }
@@ -338,6 +339,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, const std::strin
         return IS_CLOSED;
     }
     std::vector<Type> prev_solution = firstVec;
+    solution = prev_solution;
     file << prev_solution << '\n';
     for (std::size_t i = 0; i < rows; i++){
         Type sum = 0.0;
@@ -347,8 +349,8 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, const std::strin
             }
         }
         solution[i] = (1/lCoefs[i][i]) * (rCoefs[i] - sum);
+        file << solution << '\n';
     }
-    file << solution << '\n';
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
@@ -361,8 +363,8 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, const std::strin
                 }
             }
             solution[i] = (1/lCoefs[i][i]) * (rCoefs[i] - sum);
+            file << solution << '\n';
         }   
-        file << solution << '\n';
         diffVec = solution - prev_solution;
         diffNorm = normOfVector(diffVec, p);
     }
@@ -387,6 +389,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution,  const std::stri
         return IS_CLOSED;
     }
     std::vector<Type> prev_solution = firstVec;
+    solution = prev_solution;
     file << prev_solution << '\n';
     for (std::size_t i = 0; i < rows; i++){
         Type sum1 = 0.0;
@@ -398,8 +401,8 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution,  const std::stri
             sum2 += lCoefs[i][j] * solution[j];
         }
         solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
+        file << solution << '\n';
     }
-    file << solution << '\n';
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
@@ -414,8 +417,8 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution,  const std::stri
                 sum2 += lCoefs[i][j] * solution[j];
             }
             solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
+            file << solution << '\n';
         }
-        file << solution << '\n';
         diffVec = solution - prev_solution;
         diffNorm = normOfVector(diffVec, p);
     }

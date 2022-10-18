@@ -565,7 +565,7 @@ Type findLowerBoundOfcondInf(std::vector<std::vector<Type>> &lCoefs, std::vector
 }
 
 template<typename Type>
-MULTIPLIED_FLAG multiplyMatrix(const std::vector<std::vector<Type>> &matrix1, const std::vector<std::vector<Type>> &matrix2, std::vector<std::vector<Type>> &result){
+MULTIPLIED_FLAG multiplyMatrix(std::vector<std::vector<Type>> &matrix1, const std::vector<std::vector<Type>> &matrix2, std::vector<std::vector<Type>> &result){
     std::size_t rows1 = matrix1.size();
     std::size_t cols1 = 0;
     if (rows1 != 0)
@@ -586,10 +586,10 @@ MULTIPLIED_FLAG multiplyMatrix(const std::vector<std::vector<Type>> &matrix1, co
     }
     std::size_t rows = result.size();
     std::size_t cols = result[0].size();
-    for (size_t i = 0; i < rows; i++){
-        for (size_t j = 0; j < cols; j++){
-            Type sum = 0;
-            for (size_t k = 0; k < cols1; k++){
+    for (std::size_t  i = 0; i < rows; i++){
+        for (std::size_t  j = 0; j < cols; j++){
+            Type sum = 0.0;
+            for (std::size_t  k = 0; k < cols1; k++){
                 sum += matrix1[i][k] * matrix2[k][j];
             }
             result[i][j] = sum;
@@ -758,7 +758,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type tao, Type a
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     std::size_t numOfIt = 1;
-    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy || diffNorm > accuracy){
+    while (diffNorm > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum = 0.0;
@@ -799,7 +799,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, d
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     std::size_t numOfIt = 1;
-    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
+    while (diffNorm > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum = 0.0;
@@ -844,7 +844,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     std::size_t numOfIt = 1;
-    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
+    while (diffNorm > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum1 = 0.0;
@@ -929,8 +929,8 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
             }
         }
     }
-    for (std::size_t j = 0; j < cols; j++){
-        y[j] = tao * rCoefs[j];
+    for (std::size_t i = 0; i < cols; i++){
+        y[i] = tao * rCoefs[i];
     }
     return IS_QUADRATIC;
 }
@@ -964,15 +964,15 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
             }
         }
     }
-    for (std::size_t j = 0; j < cols; j++){
-        y[j] = rCoefs[j] / lCoefs[j][j];
+    for (std::size_t i = 0; i < rows; i++){
+        y[i] = rCoefs[i] / lCoefs[i][i];
     }
     return IS_QUADRATIC;
 }
 
 template<typename Type>
 QUADRATIC_FLAG findCanonicalFormRelaxation(const std::vector<std::vector<Type>> &lCoefs, 
-const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y){
+const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y, Type omega){
     std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
     std::size_t cols = 0;
     if (rows != 0)
@@ -985,11 +985,46 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
     if (rows != cols)
         return NOT_QUADRATIC;
     C.resize(rows);
+    std::vector<std::vector<Type>> DU(rows);
+    std::vector<std::vector<Type>> LD(rows);
     for (std::size_t i = 0; i < rows; i++){
         C[i].resize(cols, 0);
+        DU[i].resize(cols, 0);
+        LD[i].resize(cols, 0);
     } 
+    for (std::size_t i = 0; i < rows; i++){
+        DU[i][i] = (1 - omega) * lCoefs[i][i];
+        for (std::size_t j = i + 1; j < cols; j++){
+            DU[i][j] = -omega * lCoefs[i][j];
+        }
+    }
+    LD[0][0] = 1 / lCoefs[0][0];
+    for (std::size_t i = 1; i < rows; i++){
+        LD[i][i] = 1 / lCoefs[i][i];
+        for (std::size_t j = 0; j < i; j++){
+            Type sum = 0.0;
+            for (std::size_t k = 0; k < i; k++){
+                sum += LD[k][j] * lCoefs[i][k];
+            }
+            LD[i][j] = -omega * LD[i][i] * sum;
+        }
+    }
+    std::vector<std::vector<Type>> res;
+    multiplyMatrix(LD, DU, C);
     y.resize(cols, 0);
+    y = omega * LD * rCoefs;
     return IS_QUADRATIC;
+    /*
+    for (std::size_t i = 0; i < rows; i++){
+        for (std::size_t j = 0; j < cols; j++){
+            Type sum = 0.0;
+            for (std::size_t k = 0; k < j - 1; k++){
+                sum += -omega * C[i][k] * lCoefs[k][j];
+            }
+            C[i][j] = (1 - omega) * C[i][j] * lCoefs[j][j] + sum + (1 - omega) * C[i][j]* lCoefs[j][j];
+        }
+    }
+    */
 }
 
 template<typename Type>

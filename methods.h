@@ -83,7 +83,7 @@ template<typename Type>
 Type findLowerBoundOfcondInf(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, Type delta1 = 1e-1, Type delta2 = 1e-3, Type delta3 = 1e-6);
 
 template<typename Type>
-MULTIPLIED_FLAG multiplyMatrix(const std::vector<std::vector<Type>> &matrix1, const std::vector<std::vector<Type>> &matrix2, std::vector<std::vector<Type>> &result);
+MULTIPLIED_FLAG multiplyMatrix(std::vector<std::vector<Type>> &matrix1, const std::vector<std::vector<Type>> &matrix2, std::vector<std::vector<Type>> &result);
 
 template<typename Type>
 MULTIPLIED_FLAG multiplyMatrix(const std::vector<std::vector<Type>> &matrix, const std::vector<Type> &vec, std::vector<Type> &result);
@@ -117,7 +117,7 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
 
 template<typename Type>
 QUADRATIC_FLAG findCanonicalFormRelaxation(const std::vector<std::vector<Type>> &lCoefs, 
-const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y);
+const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y, Type omega = 1.0);
 
 template<typename Type>
 Type findLowerBoundOfIterations(const std::vector<std::vector<Type>> &lCoefs, 
