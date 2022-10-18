@@ -16,7 +16,8 @@ Type accuracy = 1e-7){
     std::vector<Type> solution;
     std::vector<std::vector<Type>> C;
     std::vector<Type> y;
-    std::size_t numOfIt;
+    Type residual = 0.0;
+    std::size_t numOfIt = 0;
     Type tao = 0.0;
     Type omega = 0.0;
     double p = INFINITY;
@@ -26,12 +27,16 @@ Type accuracy = 1e-7){
     tao = 1e-4;
     numOfIt = simpleItMethod(lCoefSys, rCoefSys, startPoint, solution, tao, accuracy, p, eps0, 10000000);
     writeData(solution, startPoint, accuracy, SIMPLE_IT_F_PATH, numOfIt, tao, 0.0);
+    residual = findResidual(lCoefSys, rCoefSys, solution);
+    writeResidual(residual, SIMPLE_IT_F_PATH);
     findCanonicalFormSimpleIt(lCoefSys, rCoefSys, C, y, tao);
     writeCanonicalForm(C, y, SIMPLE_IT_F_PATH);
 
     // Метод Якоби
     numOfIt = JacobiMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, p, eps0);
     writeData(solution, startPoint, accuracy, JACOBI_F_PATH, numOfIt);
+    residual = findResidual(lCoefSys, rCoefSys, solution);
+    writeResidual(residual, JACOBI_F_PATH);
     findCanonicalFormJacobi(lCoefSys, rCoefSys, C, y);
     writeCanonicalForm(C, y, JACOBI_F_PATH);
 
@@ -39,9 +44,13 @@ Type accuracy = 1e-7){
     omega = 1.0;
     numOfIt = relaxationMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, omega, p, eps0);
     writeData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
+    residual = findResidual(lCoefSys, rCoefSys, solution);
+    writeResidual(residual, RELAXATION_F_PATH);
     omega = 1.25;
     numOfIt = relaxationMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, omega, p, eps0);
     addData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
+    residual = findResidual(lCoefSys, rCoefSys, solution);
+    writeResidual(residual, RELAXATION_F_PATH);
     //findCanonicalFormSimpleIt(lCoefSys, rCoefSys, C, y, tao);
     //writeCanonicalForm(C, y, SIMPLE_IT_F_PATH);
 
