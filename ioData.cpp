@@ -218,7 +218,7 @@ FILE_FLAG writeResidual(Type residual, const std::string& OUT_FILE_PATH){
 	file.open(OUT_FILE_PATH, std::ios::app);
 	if (!file.is_open())
 		exit(NOT_OPEN); 
-    file << '\n' << '\n';
+    file << '\n';
     file << "Residual = " << residual;
 	file.close();
 	return IS_CLOSED;
@@ -426,3 +426,37 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution,  const std::stri
     return IS_CLOSED;
 }
 
+template<typename Type>
+FILE_FLAG writeNormOfError(std::vector<Type> &solution, std::vector<Type> &realSolution, const std::string& OUT_FILE_PATH, double p){
+    std::ofstream file;
+	file.open(OUT_FILE_PATH, std::ios::app);
+	if (!file.is_open())
+		exit(NOT_OPEN);
+    file << '\n';
+    file << "Norm of error: " << normOfVector(solution - realSolution, p);
+    file.close();
+    return IS_CLOSED;
+}
+
+FILE_FLAG writeExactIters(std::size_t exactIterations, const std::string& OUT_FILE_PATH){
+	std::ofstream file;
+	file.open(OUT_FILE_PATH, std::ios::app);
+	if (!file.is_open())
+		exit(NOT_OPEN); 
+    file << '\n';
+    file << "Exact iterations = " << exactIterations;
+	file.close();
+	return IS_CLOSED;
+}
+
+template<typename Type>
+FILE_FLAG writeNormErrAfterEstIt(Type normErr, const std::string& OUT_FILE_PATH){
+	std::ofstream file;
+	file.open(OUT_FILE_PATH, std::ios::app);
+	if (!file.is_open())
+		exit(NOT_OPEN); 
+    file << '\n';
+    file << "Norm of error after ets. iterations = " << normErr;
+	file.close();
+	return IS_CLOSED;
+}

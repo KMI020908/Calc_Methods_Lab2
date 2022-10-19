@@ -25,15 +25,15 @@ std::size_t simpleItMethod(const std::vector<std::vector<Type>> &lCoefs, const s
 
 template<typename Type>
 std::size_t JacobiMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
-const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 1e-7, double p = 2.0, Type epsilon_0 = 1e-4, std::size_t stopIt = 100000);
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 1e-7, double p = 2.0, Type epsilon_0 = 1e-7, std::size_t stopIt = 100000);
 
 template<typename Type>
 std::size_t relaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
-const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 1e-7, Type omega = 1.0, double p = 2.0, Type epsilon_0 = 1e-4, std::size_t stopIt = 100000);
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy = 1e-7, Type omega = 1.0, double p = 2.0, Type epsilon_0 = 1e-7, std::size_t stopIt = 100000);
 
 template<typename Type>
 std::size_t relaxationMethodFor3Diag(const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> & c, const std::vector<Type> &d, 
-const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy  = 1e-7, Type omega = 1.0, double p = 2.0, Type epsilon_0 = 1e-4, std::size_t stopIt = 100000);
+const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy  = 1e-7, Type omega = 1.0, double p = 2.0, Type epsilon_0 = 1e-7, std::size_t stopIt = 100000);
 
 // Вспомогательные функции
 template<typename Type>
@@ -123,5 +123,29 @@ template<typename Type>
 Type findLowerBoundOfIterations(const std::vector<std::vector<Type>> &lCoefs, 
 const std::vector<Type> &rCoefs, const std::vector<Type> &firstVec, Type accuracy, ITERATION_METHOD_FLAG method, 
 Type tao, Type omega = 1.0, double p = 2.0);
+
+template<typename Type>
+std::size_t findExactItersSimpleItMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type tao, Type accuracy, double p, std::size_t stopIt = SIZE_MAX);
+
+template<typename Type>
+std::size_t findExactItersJacobiMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type accuracy, double p, std::size_t stopIt = SIZE_MAX);
+
+template<typename Type>
+std::size_t findExactRelaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type accuracy, Type omega, double p, std::size_t stopIt = SIZE_MAX);
+
+template<typename Type>
+Type findNormOfErrAfterEstIt_SIT(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type bound, Type tao, Type accuracy, double p, std::size_t stopIt = SIZE_MAX);
+
+template<typename Type>
+Type findNormOfErrAfterEstIt_JAC(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type bound, Type accuracy, double p, std::size_t stopIt = SIZE_MAX);
+
+template<typename Type>
+Type findNormOfErrAfterEstIt_REL(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type bound, Type tao, Type accuracy, double p, std::size_t stopIt = SIZE_MAX);
 
 #endif

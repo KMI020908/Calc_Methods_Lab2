@@ -59,4 +59,12 @@ template<typename Type>
 FILE_FLAG writePointsOfRelaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
 const std::vector<Type> &firstVec, std::vector<Type> &solution,  const std::string& OUT_FILE_PATH, Type accuracy = 1e-7, Type omega = 1.0, double p = 2.0, Type epsilon_0 = 1e-4);
 
+template<typename Type>
+FILE_FLAG writeNormOfError(std::vector<Type> &solution, std::vector<Type> &realSolution, const std::string& OUT_FILE_PATH, double p = 2.0);
+
+template<typename Type>
+FILE_FLAG writeNormErrAfterEstIt(Type normErr, const std::string& OUT_FILE_PATH);
+
+FILE_FLAG writeExactIters(std::size_t exactIterations, const std::string& OUT_FILE_PATH);
+
 #endif

@@ -758,7 +758,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type tao, Type a
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     std::size_t numOfIt = 1;
-    while (diffNorm > accuracy){
+    while (normOfVector(lCoefs * solution - rCoefs, p) > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum = 0.0;
@@ -799,7 +799,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, d
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     std::size_t numOfIt = 1;
-    while (diffNorm > accuracy){
+    while (normOfVector(lCoefs * solution - rCoefs, p) > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum = 0.0;
@@ -844,7 +844,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     std::size_t numOfIt = 1;
-    while (diffNorm > accuracy){
+    while (normOfVector(lCoefs * solution - rCoefs, p) > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum1 = 0.0;
@@ -1084,5 +1084,265 @@ const std::vector<Type> &rCoefs, const std::vector<Type> &firstVec, Type accurac
     }
     Type distance = normOfVector(solution - prev_solution, p);
     Type q = normOfMatrix(C, p);
-    return std::log(accuracy * (1 - q) / distance) / std::log(q);
+    return std::ceil(std::log(accuracy * (1 - q) / distance) / std::log(q));
+}
+
+template<typename Type>
+std::size_t findExactItersSimpleItMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type tao, Type accuracy, double p, std::size_t stopIt){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return 0;
+    std::vector<Type> prev_solution = firstVec;
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum = 0.0;
+        for (std::size_t j = 0; j < cols; j++){
+            sum += lCoefs[i][j] * prev_solution[j];
+        }
+        solution[i] = prev_solution[i] + tao * (rCoefs[i] - sum);
+    }
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    std::size_t numOfIt = 1;
+    while (normOfVector(solution - rightSolution, p) > accuracy){
+        prev_solution = solution;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum = 0.0;
+            for (std::size_t j = 0; j < cols; j++){
+                sum += lCoefs[i][j] * prev_solution[j];
+            }
+            solution[i] = prev_solution[i] + tao * (rCoefs[i] - sum);
+        }
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        if (numOfIt == stopIt)
+            break;
+        numOfIt++;
+    }
+    return numOfIt;
+}
+
+template<typename Type>
+std::size_t findExactItersJacobiMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type accuracy, double p, std::size_t stopIt){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return 0;
+    std::vector<Type> prev_solution = firstVec;
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum = 0.0;
+        for (std::size_t j = 0; j < cols; j++){
+            if (i != j){
+                sum += lCoefs[i][j] * prev_solution[j];
+            }
+        }
+        solution[i] = (1/lCoefs[i][i]) * (rCoefs[i] - sum);
+    }
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    std::size_t numOfIt = 1;
+    while (normOfVector(solution - rightSolution, p) > accuracy){
+        prev_solution = solution;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum = 0.0;
+            for (std::size_t j = 0; j < cols; j++){
+                if (i != j){
+                    sum += lCoefs[i][j] * prev_solution[j];
+                }
+            }
+            solution[i] = (1/lCoefs[i][i]) * (rCoefs[i] - sum);
+        }   
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        if (numOfIt == stopIt)
+            break;
+        numOfIt++;
+    }
+    return numOfIt;
+}
+
+template<typename Type>
+std::size_t findExactRelaxationMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type accuracy, Type omega, double p, std::size_t stopIt){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return 0;
+    std::vector<Type> prev_solution = firstVec;
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum1 = 0.0;
+        for (std::size_t j = 0; j < i; j++){
+            sum1 += lCoefs[i][j] * solution[j];
+        }
+        Type sum2 = 0.0;
+        for (std::size_t j = i + 1; j < cols; j++){
+            sum2 += lCoefs[i][j] * solution[j];
+        }
+        solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
+    }
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    std::size_t numOfIt = 1;
+    while (normOfVector(solution - rightSolution, p) > accuracy){
+        prev_solution = solution;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum1 = 0.0;
+            for (std::size_t j = 0; j < i; j++){
+                sum1 += lCoefs[i][j] * solution[j];
+            }
+            Type sum2 = 0.0;
+            for (std::size_t j = i + 1; j < cols; j++){
+                sum2 += lCoefs[i][j] * solution[j];
+            }
+            solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
+        }
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        if (numOfIt == stopIt){
+            break;
+        }
+        numOfIt++;
+    }
+    return numOfIt;
+}
+
+template<typename Type>
+Type findNormOfErrAfterEstIt_SIT(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type bound, Type tao, Type accuracy, double p, std::size_t stopIt){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NAN;
+    std::vector<Type> prev_solution = firstVec;
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum = 0.0;
+        for (std::size_t j = 0; j < cols; j++){
+            sum += lCoefs[i][j] * prev_solution[j];
+        }
+        solution[i] = prev_solution[i] + tao * (rCoefs[i] - sum);
+    }
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    std::size_t numOfIt = 1;
+    while (numOfIt < bound + 1){
+        prev_solution = solution;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum = 0.0;
+            for (std::size_t j = 0; j < cols; j++){
+                sum += lCoefs[i][j] * prev_solution[j];
+            }
+            solution[i] = prev_solution[i] + tao * (rCoefs[i] - sum);
+        }
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        if (numOfIt == stopIt)
+            break;
+        numOfIt++;
+    }
+    return normOfVector(solution - rightSolution, p);
+}
+
+template<typename Type>
+Type findNormOfErrAfterEstIt_JAC(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type bound, Type accuracy, double p, std::size_t stopIt){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return INFINITY;
+    std::vector<Type> prev_solution = firstVec;
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum = 0.0;
+        for (std::size_t j = 0; j < cols; j++){
+            if (i != j){
+                sum += lCoefs[i][j] * prev_solution[j];
+            }
+        }
+        solution[i] = (1/lCoefs[i][i]) * (rCoefs[i] - sum);
+    }
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    std::size_t numOfIt = 1;
+    while (numOfIt < bound + 1){
+        prev_solution = solution;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum = 0.0;
+            for (std::size_t j = 0; j < cols; j++){
+                if (i != j){
+                    sum += lCoefs[i][j] * prev_solution[j];
+                }
+            }
+            solution[i] = (1/lCoefs[i][i]) * (rCoefs[i] - sum);
+        }   
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        if (numOfIt == stopIt)
+            break;
+        numOfIt++;
+    }
+    return normOfVector(solution - rightSolution, p);
+}
+
+template<typename Type>
+Type findNormOfErrAfterEstIt_REL(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, 
+const std::vector<Type> &firstVec, std::vector<Type> &solution, std::vector<Type> &rightSolution, Type bound, Type omega, Type accuracy, double p, std::size_t stopIt){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    solution.resize(rows); // Искомое решение
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return 0;
+    std::vector<Type> prev_solution = firstVec;
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum1 = 0.0;
+        for (std::size_t j = 0; j < i; j++){
+            sum1 += lCoefs[i][j] * solution[j];
+        }
+        Type sum2 = 0.0;
+        for (std::size_t j = i + 1; j < cols; j++){
+            sum2 += lCoefs[i][j] * solution[j];
+        }
+        solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
+    }
+    std::vector<Type> diffVec = solution - prev_solution;
+    Type diffNorm = normOfVector(diffVec, p);
+    std::size_t numOfIt = 1;
+    while (numOfIt < bound + 1){
+        prev_solution = solution;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum1 = 0.0;
+            for (std::size_t j = 0; j < i; j++){
+                sum1 += lCoefs[i][j] * solution[j];
+            }
+            Type sum2 = 0.0;
+            for (std::size_t j = i + 1; j < cols; j++){
+                sum2 += lCoefs[i][j] * solution[j];
+            }
+            solution[i] = (1 - omega) * prev_solution[i] - (omega / lCoefs[i][i]) * (sum1 + sum2 - rCoefs[i]);
+        }
+        diffVec = solution - prev_solution;
+        diffNorm = normOfVector(diffVec, p);
+        if (numOfIt == stopIt){
+            break;
+        }
+        numOfIt++;
+    }
+    return normOfVector(solution - rightSolution, p);
 }

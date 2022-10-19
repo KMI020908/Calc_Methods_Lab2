@@ -8,7 +8,7 @@
 template<typename Type>
 void checkTest(std::vector<std::vector<Type>> &lCoefSys, std::vector<Type> &rCoefSys, const std::vector<Type> &startPoint,
 const std::string &IN_FILE_PATH, const std::string &SIMPLE_IT_F_PATH, const std::string &JACOBI_F_PATH, const std::string &RELAXATION_F_PATH, 
-Type accuracy = 1e-7){
+Type accuracy = 1e-7, std::vector<double> realSolution = {}){
     // Считываем данные
     readData<Type>(lCoefSys, rCoefSys, IN_FILE_PATH);
 
@@ -23,8 +23,10 @@ Type accuracy = 1e-7){
     double p = INFINITY;
     Type eps0 = 1e-8;
     Type bound = 0.0;
+    Type errNorm = 0.0;
     ITERATION_METHOD_FLAG method;
-    /*
+    std::size_t exactIt = 0;
+    
     // Метод простой итерации
     method = SIMPLE_IT;
     tao = 1e-4;
@@ -32,17 +34,45 @@ Type accuracy = 1e-7){
     writeData(solution, startPoint, accuracy, SIMPLE_IT_F_PATH, numOfIt, tao, 0.0);
     bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
     writeBoundOfIterations(bound, SIMPLE_IT_F_PATH);
+    writeNormOfError(solution, realSolution, SIMPLE_IT_F_PATH, p);
+    /*
+    exactIt = findExactItersSimpleItMethod(lCoefSys, rCoefSys, startPoint, solution, realSolution, tao, accuracy, p);
+    writeExactIters(exactIt, SIMPLE_IT_F_PATH);
+    errNorm = findNormOfErrAfterEstIt_SIT(lCoefSys, rCoefSys, startPoint, solution, realSolution, bound, tao, accuracy, p);
+    writeNormErrAfterEstIt(errNorm, SIMPLE_IT_F_PATH);
+    */
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, SIMPLE_IT_F_PATH);
     findCanonicalFormSimpleIt(lCoefSys, rCoefSys, C, y, tao);
     writeCanonicalForm(C, y, SIMPLE_IT_F_PATH);
-*/
+    tao = 1e-6;
+    numOfIt = simpleItMethod(lCoefSys, rCoefSys, startPoint, solution, tao, accuracy, p, eps0, 100000000);
+    addData(solution, startPoint, accuracy, SIMPLE_IT_F_PATH, numOfIt, tao, 0.0);
+    bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
+    writeBoundOfIterations(bound, SIMPLE_IT_F_PATH);
+    writeNormOfError(solution, realSolution, SIMPLE_IT_F_PATH, p);
+    /*
+    exactIt = findExactItersSimpleItMethod(lCoefSys, rCoefSys, startPoint, solution, realSolution, tao, accuracy, p);
+    writeExactIters(exactIt, SIMPLE_IT_F_PATH);
+    errNorm = findNormOfErrAfterEstIt_SIT(lCoefSys, rCoefSys, startPoint, solution, realSolution, bound, tao, accuracy, p);
+    writeNormErrAfterEstIt(errNorm, SIMPLE_IT_F_PATH);
+    */
+    residual = findResidual(lCoefSys, rCoefSys, solution);
+    writeResidual(residual, SIMPLE_IT_F_PATH);
+    findCanonicalFormSimpleIt(lCoefSys, rCoefSys, C, y, tao);
+    writeCanonicalForm(C, y, SIMPLE_IT_F_PATH);
+
     // Метод Якоби
     method = JACOBI;
     numOfIt = JacobiMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, p, eps0);
     writeData(solution, startPoint, accuracy, JACOBI_F_PATH, numOfIt);
     bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
     writeBoundOfIterations(bound, JACOBI_F_PATH);
+    writeNormOfError(solution, realSolution, JACOBI_F_PATH, p);
+    exactIt = findExactItersJacobiMethod(lCoefSys, rCoefSys, startPoint, solution, realSolution, accuracy, p);
+    writeExactIters(exactIt, JACOBI_F_PATH);
+    errNorm = findNormOfErrAfterEstIt_JAC(lCoefSys, rCoefSys, startPoint, solution, realSolution, bound, accuracy, p);
+    writeNormErrAfterEstIt(errNorm, JACOBI_F_PATH);
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, JACOBI_F_PATH);
     findCanonicalFormJacobi(lCoefSys, rCoefSys, C, y);
@@ -55,6 +85,39 @@ Type accuracy = 1e-7){
     writeData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
     bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
     writeBoundOfIterations(bound, RELAXATION_F_PATH);
+    writeNormOfError(solution, realSolution, RELAXATION_F_PATH, p);
+    exactIt = findExactRelaxationMethod(lCoefSys, rCoefSys, startPoint, solution, realSolution, accuracy, omega, p);
+    writeExactIters(exactIt, RELAXATION_F_PATH);
+    errNorm = findNormOfErrAfterEstIt_REL(lCoefSys, rCoefSys, startPoint, solution, realSolution, bound, omega, accuracy, p);
+    writeNormErrAfterEstIt(errNorm, RELAXATION_F_PATH);
+    residual = findResidual(lCoefSys, rCoefSys, solution);
+    writeResidual(residual, RELAXATION_F_PATH);
+    findCanonicalFormRelaxation(lCoefSys, rCoefSys, C, y, omega);
+    writeCanonicalForm(C, y, RELAXATION_F_PATH);
+    omega = 0.25;
+    numOfIt = relaxationMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, omega, p, eps0);
+    addData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
+    bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
+    writeBoundOfIterations(bound, RELAXATION_F_PATH);
+    writeNormOfError(solution, realSolution, RELAXATION_F_PATH, p);
+    exactIt = findExactRelaxationMethod(lCoefSys, rCoefSys, startPoint, solution, realSolution, accuracy, omega, p);
+    writeExactIters(exactIt, RELAXATION_F_PATH);
+    errNorm = findNormOfErrAfterEstIt_REL(lCoefSys, rCoefSys, startPoint, solution, realSolution, bound, omega, accuracy, p);
+    writeNormErrAfterEstIt(errNorm, RELAXATION_F_PATH);
+    residual = findResidual(lCoefSys, rCoefSys, solution);
+    writeResidual(residual, RELAXATION_F_PATH);
+    findCanonicalFormRelaxation(lCoefSys, rCoefSys, C, y, omega);
+    writeCanonicalForm(C, y, RELAXATION_F_PATH);
+    omega = 0.5;
+    numOfIt = relaxationMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, omega, p, eps0);
+    addData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
+    bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
+    writeBoundOfIterations(bound, RELAXATION_F_PATH);
+    writeNormOfError(solution, realSolution, RELAXATION_F_PATH, p);
+    exactIt = findExactRelaxationMethod(lCoefSys, rCoefSys, startPoint, solution, realSolution, accuracy, omega, p);
+    writeExactIters(exactIt, RELAXATION_F_PATH);
+    errNorm = findNormOfErrAfterEstIt_REL(lCoefSys, rCoefSys, startPoint, solution, realSolution, bound, omega, accuracy, p);
+    writeNormErrAfterEstIt(errNorm, RELAXATION_F_PATH);
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, RELAXATION_F_PATH);
     findCanonicalFormRelaxation(lCoefSys, rCoefSys, C, y, omega);
@@ -64,6 +127,31 @@ Type accuracy = 1e-7){
     addData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
     bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
     writeBoundOfIterations(bound, RELAXATION_F_PATH);
+    writeNormOfError(solution, realSolution, RELAXATION_F_PATH, p);
+    exactIt = findExactRelaxationMethod(lCoefSys, rCoefSys, startPoint, solution, realSolution, accuracy, omega, p);
+    writeExactIters(exactIt, RELAXATION_F_PATH);
+    errNorm = findNormOfErrAfterEstIt_REL(lCoefSys, rCoefSys, startPoint, solution, realSolution, bound, omega, accuracy, p);
+    writeNormErrAfterEstIt(errNorm, RELAXATION_F_PATH);
+    residual = findResidual(lCoefSys, rCoefSys, solution);
+    writeResidual(residual, RELAXATION_F_PATH);
+    findCanonicalFormRelaxation(lCoefSys, rCoefSys, C, y, omega);
+    writeCanonicalForm(C, y, RELAXATION_F_PATH);
+    omega = 1.5;
+    numOfIt = relaxationMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, omega, p, eps0);
+    addData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
+    bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
+    writeBoundOfIterations(bound, RELAXATION_F_PATH);
+    writeNormOfError(solution, realSolution, RELAXATION_F_PATH, p);
+    residual = findResidual(lCoefSys, rCoefSys, solution);
+    writeResidual(residual, RELAXATION_F_PATH);
+    findCanonicalFormRelaxation(lCoefSys, rCoefSys, C, y, omega);
+    writeCanonicalForm(C, y, RELAXATION_F_PATH);
+    omega = 1.75;
+    numOfIt = relaxationMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, omega, p, eps0);
+    addData(solution, startPoint, accuracy, RELAXATION_F_PATH, numOfIt, 0.0, omega);
+    bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
+    writeBoundOfIterations(bound, RELAXATION_F_PATH);
+    writeNormOfError(solution, realSolution, RELAXATION_F_PATH, p);
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, RELAXATION_F_PATH);
     findCanonicalFormRelaxation(lCoefSys, rCoefSys, C, y, omega);
@@ -78,23 +166,26 @@ void temp_main(){
     std::vector<Type> rCoefSys; // Вектор правых коэффициентов
     std::vector<Type> startPoint = {0.0, 0.0, 0.0, 0.0};
 
+    std::vector<double> realSolution2 = {10.0, -10.0, 12.0, 4.0};
+    std::vector<double> realSolution1 = {5.0, -7.0, 12.0, 4.0};
+
     // Точность 1e-4
     //checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS4, JACOBI_F_PATH_1_EPS4, RELAXATION_F_PATH_1_EPS4, 1e-4);
 
     //checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS4, JACOBI_F_PATH_2_EPS4, RELAXATION_F_PATH_2_EPS4, 1e-4);
 
-    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS4, JACOBI_F_PATH_4_EPS4, RELAXATION_F_PATH_4_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS4, JACOBI_F_PATH_4_EPS4, RELAXATION_F_PATH_4_EPS4, 1e-4, realSolution1);
 
-    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_5, SIMPLE_IT_F_PATH_5_EPS4, JACOBI_F_PATH_5_EPS4, RELAXATION_F_PATH_5_EPS4, 1e-4);
+    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_5, SIMPLE_IT_F_PATH_5_EPS4, JACOBI_F_PATH_5_EPS4, RELAXATION_F_PATH_5_EPS4, 1e-4, realSolution2);
 
     // Точность 1e-7
     //checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_1, SIMPLE_IT_F_PATH_1_EPS7, JACOBI_F_PATH_1_EPS7, RELAXATION_F_PATH_1_EPS7, 1e-7);
 
     //checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_2, SIMPLE_IT_F_PATH_2_EPS7, JACOBI_F_PATH_2_EPS7, RELAXATION_F_PATH_2_EPS7, 1e-7);
 
-    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS7, JACOBI_F_PATH_4_EPS7, RELAXATION_F_PATH_4_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_4, SIMPLE_IT_F_PATH_4_EPS7, JACOBI_F_PATH_4_EPS7, RELAXATION_F_PATH_4_EPS7, 1e-7, realSolution1);
 
-    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_5, SIMPLE_IT_F_PATH_5_EPS7, JACOBI_F_PATH_5_EPS7, RELAXATION_F_PATH_5_EPS7, 1e-7);
+    checkTest(lCoefSys, rCoefSys, startPoint, IN_FILE_PATH_5, SIMPLE_IT_F_PATH_5_EPS7, JACOBI_F_PATH_5_EPS7, RELAXATION_F_PATH_5_EPS7, 1e-7, realSolution2);
 
 }
 
