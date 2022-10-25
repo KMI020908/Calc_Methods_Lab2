@@ -196,10 +196,10 @@ int main(){
     std::vector<double> f;
     std::vector<double> solution;
     readData(A, f, IN_FILE_PATH_3);
-    std::vector<double> fVec = {3.5, 0.5};
+    std::vector<double> fVec = {0, 0};
     writePointsOfJacobiMethod(A, f, fVec, solution, JACOBI_POINTS_FILE_PATH);
     writePointsOfRelaxationMethod(A, f, fVec, solution, ZEIDEL_POINTS_FILE_PATH);
-    writePointsOfRelaxationMethod(A, f, fVec, solution, RELAXATION_POINTS_FILE_PATH, 1e-7, 1.9);
+    writePointsOfRelaxationMethod(A, f, fVec, solution, RELAXATION_POINTS_FILE_PATH, 1e-7, 0.5);
 
     // Большая матрица
     std::vector<double> a, b, c, d;
@@ -219,8 +219,35 @@ int main(){
     d.push_back(9 - 3 * ((n - 1) % 2));
     std::vector<double> firstVec(n, 0.0);
     double accuracy = 1e-7;
-    relaxationMethodFor3Diag(a, b, c, d, firstVec, solution, accuracy, 1.0, INFINITY, 1e-4);
-    std::cout << solution << '\n';
+    //std::cout << relaxationMethodFor3Diag(a, b, c, d, firstVec, solution, accuracy, 0.25, INFINITY, 1e-4) << '\n';
+    //std::cout << solution << '\n' << '\n';
+    for (size_t i = 0; i < n - 1; i++){
+        double temp = a[i];
+        a[i] = c[i];
+        c[i] = temp;
+    }
+    //std::cout << relaxationMethodFor3Diag(a, b, c, d, firstVec, solution, accuracy, 0.25, INFINITY, 1e-4) << '\n';
+    //std::cout << solution << '\n' << '\n';
+
+    a.clear();
+    b.clear();
+    c.clear();
+    d.clear();
+    for (size_t i = 0; i < n - 1; i++){
+        a.push_back(6.0);
+        c.push_back(1.0);
+    }
+    for (size_t i = 0; i < n; i++){
+        b.push_back(8.0);
+        d.push_back(1.0);
+    }
+    std::cout << relaxationMethodFor3Diag(a, b, c, d, firstVec, solution, accuracy, 1.0, INFINITY, 1e-7) << '\n';
+    std::cout << solution << '\n' << '\n';
+    std::cout << relaxationMethodFor3Diag(c, b, a, d, firstVec, solution, accuracy, 1.0, INFINITY, 1e-7) << '\n';
+    std::cout << solution << '\n' << '\n';
+    
+    readData(A, f, IN_FILE_PATH_4);
+    std::cout << findCond_inf(A) << '\n';
 
     return 0;
 }

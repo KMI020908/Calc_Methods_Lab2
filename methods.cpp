@@ -758,7 +758,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type tao, Type a
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     std::size_t numOfIt = 1;
-    while (normOfVector(lCoefs * solution - rCoefs, p) > accuracy){
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum = 0.0;
@@ -799,7 +799,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, d
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     std::size_t numOfIt = 1;
-    while (normOfVector(lCoefs * solution - rCoefs, p) > accuracy){
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum = 0.0;
@@ -844,7 +844,7 @@ const std::vector<Type> &firstVec, std::vector<Type> &solution, Type accuracy, T
     std::vector<Type> diffVec = solution - prev_solution;
     Type diffNorm = normOfVector(diffVec, p);
     std::size_t numOfIt = 1;
-    while (normOfVector(lCoefs * solution - rCoefs, p) > accuracy){
+    while (diffNorm / (normOfVector(prev_solution, p) + epsilon_0) > accuracy){
         prev_solution = solution;
         for (std::size_t i = 0; i < rows; i++){
             Type sum1 = 0.0;
@@ -985,46 +985,44 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
     if (rows != cols)
         return NOT_QUADRATIC;
     C.resize(rows);
-    std::vector<std::vector<Type>> DU(rows);
-    std::vector<std::vector<Type>> LD(rows);
     for (std::size_t i = 0; i < rows; i++){
         C[i].resize(cols, 0);
-        DU[i].resize(cols, 0);
-        LD[i].resize(cols, 0);
-    } 
-    for (std::size_t i = 0; i < rows; i++){
-        DU[i][i] = (1 - omega) * lCoefs[i][i];
-        for (std::size_t j = i + 1; j < cols; j++){
-            DU[i][j] = -omega * lCoefs[i][j];
-        }
     }
-    LD[0][0] = 1 / lCoefs[0][0];
+    C[0][0] = 1 - omega; 
+    for (std::size_t j = 1; j < cols; j++){
+        C[0][j] = -omega * lCoefs[0][j] / lCoefs[0][0];
+    }
     for (std::size_t i = 1; i < rows; i++){
-        LD[i][i] = 1 / lCoefs[i][i];
         for (std::size_t j = 0; j < i; j++){
             Type sum = 0.0;
             for (std::size_t k = 0; k < i; k++){
-                sum += LD[k][j] * lCoefs[i][k];
+                sum += -omega * (lCoefs[i][k] / lCoefs[i][i]) * C[k][j];
             }
-            LD[i][j] = -omega * LD[i][i] * sum;
+            C[i][j] = sum;
         }
-    }
-    std::vector<std::vector<Type>> res;
-    multiplyMatrix(LD, DU, C);
-    y.resize(cols, 0);
-    y = omega * LD * rCoefs;
-    return IS_QUADRATIC;
-    /*
-    for (std::size_t i = 0; i < rows; i++){
-        for (std::size_t j = 0; j < cols; j++){
+        for (std::size_t j = i; j < cols; j++){
             Type sum = 0.0;
-            for (std::size_t k = 0; k < j - 1; k++){
-                sum += -omega * C[i][k] * lCoefs[k][j];
+            if (i != j){
+                sum = -omega * lCoefs[i][j] / lCoefs[i][i];
             }
-            C[i][j] = (1 - omega) * C[i][j] * lCoefs[j][j] + sum + (1 - omega) * C[i][j]* lCoefs[j][j];
+            else{
+                sum = 1 - omega;
+            }
+            for (std::size_t k = 0; k < i; k++){
+                sum += -omega * (lCoefs[i][k] / lCoefs[i][i]) * C[k][j];
+            }
+            C[i][j] = sum;
         }
     }
-    */
+    y.resize(cols, 0);
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum = omega * rCoefs[i] / lCoefs[i][i];
+        for (std::size_t k = 0; k < i; k++){
+            sum += -omega * (lCoefs[i][k] / lCoefs[i][i]) * y[k]; 
+        }
+        y[i] = sum;
+    }
+    return IS_QUADRATIC;
 }
 
 template<typename Type>
