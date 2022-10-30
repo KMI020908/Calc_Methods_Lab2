@@ -120,6 +120,10 @@ QUADRATIC_FLAG findCanonicalFormRelaxation(const std::vector<std::vector<Type>> 
 const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y, Type omega = 1.0);
 
 template<typename Type>
+QUADRATIC_FLAG findCanonicalFormRelaxation2(const std::vector<std::vector<Type>> &lCoefs, 
+const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y, Type omega = 1.0);
+
+template<typename Type>
 Type findLowerBoundOfIterations(const std::vector<std::vector<Type>> &lCoefs, 
 const std::vector<Type> &rCoefs, const std::vector<Type> &firstVec, Type accuracy, ITERATION_METHOD_FLAG method, 
 Type tao, Type omega = 1.0, double p = 2.0);

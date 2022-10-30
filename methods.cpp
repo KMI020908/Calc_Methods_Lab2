@@ -993,25 +993,21 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
         for (std::size_t i = 0; i < rows; i++){
             Type sum1 = 0.0;
             for (std::size_t j = 0; j < i; j++){
-                sum1 += lCoefs[i][j] * columnOfMatrix[j];
+                sum1 += lCoefs[i][j] * C[j][k];
             }
             Type sum2 = 0.0;
             if (k > i){
                 sum2 = lCoefs[i][k];  
-                columnOfMatrix[i] = -(omega / lCoefs[i][i]) * (sum1 + sum2);
+                C[i][k] = -(omega / lCoefs[i][i]) * (sum1 + sum2);
             }
             else{
                 if (k < i){
-                    columnOfMatrix[i] = -(omega / lCoefs[i][i]) * sum1;
+                    C[i][k] = -(omega / lCoefs[i][i]) * sum1;
                 }
                 else{
-                    columnOfMatrix[i] = (1 - omega) - (omega / lCoefs[i][i]) * sum1;
+                    C[i][k] = (1 - omega) - (omega / lCoefs[i][i]) * sum1;
                 }
             }
-        }
-        for (std::size_t i = 0; i < rows; i++){
-            C[i][k] = columnOfMatrix[i];
-            columnOfMatrix[i] = 0.0;
         }
     }
     y.resize(cols, 0);
@@ -1026,9 +1022,8 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
 }
 
 
-/*
 template<typename Type>
-QUADRATIC_FLAG findCanonicalFormRelaxation(const std::vector<std::vector<Type>> &lCoefs, 
+QUADRATIC_FLAG findCanonicalFormRelaxation2(const std::vector<std::vector<Type>> &lCoefs, 
 const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y, Type omega){
     std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
     std::size_t cols = 0;
@@ -1081,7 +1076,6 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
     }
     return IS_QUADRATIC;
 }
-*/
 
 template<typename Type>
 Type findLowerBoundOfIterations(const std::vector<std::vector<Type>> &lCoefs, 

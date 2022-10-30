@@ -161,7 +161,7 @@ void temp_main(){
 
     std::vector<std::vector<Type>> lCoefSys; // Матрица левых коэффициентов
     std::vector<Type> rCoefSys; // Вектор правых коэффициентов
-    std::vector<Type> startPoint = {1.0, 0.0, 0.0, 0.0};
+    std::vector<Type> startPoint = {0.0, 0.0, 0.0, 0.0};
 
     std::vector<double> realSolution2 = {10.0, -10.0, 12.0, 4.0};
     std::vector<double> realSolution1 = {5.0, -7.0, 12.0, 4.0};
@@ -193,7 +193,7 @@ int main(){
     std::vector<double> f;
     std::vector<double> solution;
     readData(A, f, IN_FILE_PATH_3);
-    std::vector<double> fVec = {0, 0};
+    std::vector<double> fVec = {0.0, 0.0};
     writePointsOfJacobiMethod(A, f, fVec, solution, JACOBI_POINTS_FILE_PATH);
     writePointsOfRelaxationMethod(A, f, fVec, solution, ZEIDEL_POINTS_FILE_PATH);
     writePointsOfRelaxationMethod(A, f, fVec, solution, RELAXATION_POINTS_FILE_PATH, 1e-7, 1.0);
