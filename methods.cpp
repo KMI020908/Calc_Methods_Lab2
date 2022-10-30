@@ -18,7 +18,7 @@ SOLUTION_FLAG gaussMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Ty
                 mainRow = i;
             }
         }
-        if (mainRow != k){ //Замена строк
+        if (mainRow != k){ //Замена строк       
             Type temp;
             for (std::size_t j = 0; j < cols; j++){
                 temp = lCoefs[k][j];
@@ -988,6 +988,60 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
     for (std::size_t i = 0; i < rows; i++){
         C[i].resize(cols, 0);
     }
+    std::vector<Type> columnOfMatrix(rows, 0);
+    std::vector<Type> basis(rows, 0);
+    for (std::size_t k = 0; k < rows; k++){
+        basis[k] = 1.0;
+        for (std::size_t i = 0; i < rows; i++){
+            Type sum1 = 0.0;
+            for (std::size_t j = 0; j < i; j++){
+                sum1 += lCoefs[i][j] * columnOfMatrix[j];
+            }
+            Type sum2 = 0.0;
+            for (std::size_t j = i + 1; j < cols; j++){
+                sum2 += lCoefs[i][j] * basis[j];
+            }
+            columnOfMatrix[i] = (1 - omega) * basis[i] - (omega / lCoefs[i][i]) * (sum1 + sum2);
+        }
+        for (std::size_t i = 0; i < rows; i++){
+            C[i][k] = columnOfMatrix[i];
+        }
+        for (std::size_t i = 0; i < rows; i++){
+            basis[i] = 0.0;
+        }
+    }
+
+    y.resize(cols, 0);
+    for (std::size_t i = 0; i < rows; i++){
+        Type sum = omega * rCoefs[i] / lCoefs[i][i];
+        for (std::size_t k = 0; k < i; k++){
+            sum += -omega * (lCoefs[i][k] / lCoefs[i][i]) * y[k]; 
+        }
+        y[i] = sum;
+    }
+    return IS_QUADRATIC;
+}
+
+
+/*
+template<typename Type>
+QUADRATIC_FLAG findCanonicalFormRelaxation(const std::vector<std::vector<Type>> &lCoefs, 
+const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y, Type omega){
+    std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
+    std::size_t cols = 0;
+    if (rows != 0)
+        cols = lCoefs[0].size();
+    else
+        return NOT_QUADRATIC;
+    if (rows != cols)
+        return NOT_QUADRATIC;
+    cols = rCoefs.size();
+    if (rows != cols)
+        return NOT_QUADRATIC;
+    C.resize(rows);
+    for (std::size_t i = 0; i < rows; i++){
+        C[i].resize(cols, 0);
+    }
     C[0][0] = 1 - omega; 
     for (std::size_t j = 1; j < cols; j++){
         C[0][j] = -omega * lCoefs[0][j] / lCoefs[0][0];
@@ -1024,6 +1078,7 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
     }
     return IS_QUADRATIC;
 }
+*/
 
 template<typename Type>
 Type findLowerBoundOfIterations(const std::vector<std::vector<Type>> &lCoefs, 

@@ -28,6 +28,7 @@ Type accuracy = 1e-7, std::vector<double> realSolution = {}){
     std::size_t exactIt = 0;
     
     // Метод простой итерации
+    /*
     method = SIMPLE_IT;
     tao = 1e-4;
     numOfIt = simpleItMethod(lCoefSys, rCoefSys, startPoint, solution, tao, accuracy, p, eps0, 100000000);
@@ -35,12 +36,10 @@ Type accuracy = 1e-7, std::vector<double> realSolution = {}){
     bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
     writeBoundOfIterations(bound, SIMPLE_IT_F_PATH);
     writeNormOfError(solution, realSolution, SIMPLE_IT_F_PATH, p);
-    /*
     exactIt = findExactItersSimpleItMethod(lCoefSys, rCoefSys, startPoint, solution, realSolution, tao, accuracy, p);
     writeExactIters(exactIt, SIMPLE_IT_F_PATH);
     errNorm = findNormOfErrAfterEstIt_SIT(lCoefSys, rCoefSys, startPoint, solution, realSolution, bound, tao, accuracy, p);
     writeNormErrAfterEstIt(errNorm, SIMPLE_IT_F_PATH);
-    */
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, SIMPLE_IT_F_PATH);
     findCanonicalFormSimpleIt(lCoefSys, rCoefSys, C, y, tao);
@@ -51,17 +50,15 @@ Type accuracy = 1e-7, std::vector<double> realSolution = {}){
     bound = findLowerBoundOfIterations(lCoefSys, rCoefSys, startPoint, accuracy, method, tao, omega, p);
     writeBoundOfIterations(bound, SIMPLE_IT_F_PATH);
     writeNormOfError(solution, realSolution, SIMPLE_IT_F_PATH, p);
-    /*
     exactIt = findExactItersSimpleItMethod(lCoefSys, rCoefSys, startPoint, solution, realSolution, tao, accuracy, p);
     writeExactIters(exactIt, SIMPLE_IT_F_PATH);
     errNorm = findNormOfErrAfterEstIt_SIT(lCoefSys, rCoefSys, startPoint, solution, realSolution, bound, tao, accuracy, p);
     writeNormErrAfterEstIt(errNorm, SIMPLE_IT_F_PATH);
-    */
     residual = findResidual(lCoefSys, rCoefSys, solution);
     writeResidual(residual, SIMPLE_IT_F_PATH);
     findCanonicalFormSimpleIt(lCoefSys, rCoefSys, C, y, tao);
     writeCanonicalForm(C, y, SIMPLE_IT_F_PATH);
-
+    */
     // Метод Якоби
     method = JACOBI;
     numOfIt = JacobiMethod(lCoefSys, rCoefSys, startPoint, solution, accuracy, p, eps0);
@@ -164,7 +161,7 @@ void temp_main(){
 
     std::vector<std::vector<Type>> lCoefSys; // Матрица левых коэффициентов
     std::vector<Type> rCoefSys; // Вектор правых коэффициентов
-    std::vector<Type> startPoint = {0.0, 0.0, 0.0, 0.0};
+    std::vector<Type> startPoint = {1.0, 0.0, 0.0, 0.0};
 
     std::vector<double> realSolution2 = {10.0, -10.0, 12.0, 4.0};
     std::vector<double> realSolution1 = {5.0, -7.0, 12.0, 4.0};
@@ -199,7 +196,14 @@ int main(){
     std::vector<double> fVec = {0, 0};
     writePointsOfJacobiMethod(A, f, fVec, solution, JACOBI_POINTS_FILE_PATH);
     writePointsOfRelaxationMethod(A, f, fVec, solution, ZEIDEL_POINTS_FILE_PATH);
-    writePointsOfRelaxationMethod(A, f, fVec, solution, RELAXATION_POINTS_FILE_PATH, 1e-7, 0.5);
+    writePointsOfRelaxationMethod(A, f, fVec, solution, RELAXATION_POINTS_FILE_PATH, 1e-7, 1.0);
+    std::vector<std::vector<double>> C;
+    std::vector<double> y;
+    findCanonicalFormRelaxation(A, f, C, y);
+    std::cout << C;
+    std::cout << '\n';
+    std::cout << normOfMatrix(C, INFINITY);
+    std::cout << '\n' << '\n' << '\n';
 
     // Большая матрица
     std::vector<double> a, b, c, d;
