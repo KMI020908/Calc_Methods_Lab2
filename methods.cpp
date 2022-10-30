@@ -989,28 +989,31 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
         C[i].resize(cols, 0);
     }
     std::vector<Type> columnOfMatrix(rows, 0);
-    std::vector<Type> basis(rows, 0);
     for (std::size_t k = 0; k < rows; k++){
-        basis[k] = 1.0;
         for (std::size_t i = 0; i < rows; i++){
             Type sum1 = 0.0;
             for (std::size_t j = 0; j < i; j++){
                 sum1 += lCoefs[i][j] * columnOfMatrix[j];
             }
             Type sum2 = 0.0;
-            for (std::size_t j = i + 1; j < cols; j++){
-                sum2 += lCoefs[i][j] * basis[j];
+            if (k > i){
+                sum2 = lCoefs[i][k];  
+                columnOfMatrix[i] = -(omega / lCoefs[i][i]) * (sum1 + sum2);
             }
-            columnOfMatrix[i] = (1 - omega) * basis[i] - (omega / lCoefs[i][i]) * (sum1 + sum2);
+            else{
+                if (k < i){
+                    columnOfMatrix[i] = -(omega / lCoefs[i][i]) * sum1;
+                }
+                else{
+                    columnOfMatrix[i] = (1 - omega) - (omega / lCoefs[i][i]) * sum1;
+                }
+            }
         }
         for (std::size_t i = 0; i < rows; i++){
             C[i][k] = columnOfMatrix[i];
-        }
-        for (std::size_t i = 0; i < rows; i++){
-            basis[i] = 0.0;
+            columnOfMatrix[i] = 0.0;
         }
     }
-
     y.resize(cols, 0);
     for (std::size_t i = 0; i < rows; i++){
         Type sum = omega * rCoefs[i] / lCoefs[i][i];
