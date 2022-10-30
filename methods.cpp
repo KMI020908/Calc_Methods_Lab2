@@ -1021,7 +1021,6 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
     return IS_QUADRATIC;
 }
 
-
 template<typename Type>
 QUADRATIC_FLAG findCanonicalFormRelaxation2(const std::vector<std::vector<Type>> &lCoefs, 
 const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<Type> &y, Type omega){
