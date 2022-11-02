@@ -986,9 +986,9 @@ const std::vector<Type> &rCoefs, std::vector<std::vector<Type>> &C, std::vector<
         return NOT_QUADRATIC;
     C.resize(rows);
     for (std::size_t i = 0; i < rows; i++){
-        C[i].resize(cols, 0);
+        C[i].resize(cols, 0.0);
     }
-    std::vector<Type> columnOfMatrix(rows, 0);
+    std::vector<Type> columnOfMatrix(rows, 0.0);
     for (std::size_t k = 0; k < rows; k++){
         for (std::size_t i = 0; i < rows; i++){
             Type sum1 = 0.0;

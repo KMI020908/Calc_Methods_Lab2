@@ -187,13 +187,13 @@ void temp_main(){
 }
 
 int main(){
-    temp_main<double>();
+    //temp_main<double>();
 
     std::vector<std::vector<double>> A;
     std::vector<double> f;
     std::vector<double> solution;
     readData(A, f, IN_FILE_PATH_3);
-    std::vector<double> fVec = {0.0, 0.0};
+    std::vector<double> fVec = {40.0, 5.0};
     writePointsOfJacobiMethod(A, f, fVec, solution, JACOBI_POINTS_FILE_PATH);
     writePointsOfRelaxationMethod(A, f, fVec, solution, ZEIDEL_POINTS_FILE_PATH);
     writePointsOfRelaxationMethod(A, f, fVec, solution, RELAXATION_POINTS_FILE_PATH, 1e-7, 1.0);
@@ -249,9 +249,45 @@ int main(){
     std::cout << solution << '\n' << '\n';
     std::cout << relaxationMethodFor3Diag(c, b, a, d, firstVec, solution, accuracy, 1.0, INFINITY, 1e-7) << '\n';
     std::cout << solution << '\n' << '\n';
-    
-    readData(A, f, IN_FILE_PATH_4);
-    std::cout << findCond_inf(A) << '\n';
 
+    std::size_t dim = 200;
+    std::vector<std::vector<double>> matrix(dim);
+    for (size_t i = 0; i < dim; i++){
+        matrix[i].resize(dim, 0.0);
+    }
+    matrix[0][0] = 8.0;
+    matrix[0][1] = 1.0;
+    matrix[dim - 1][dim - 1] = 8.0;
+    matrix[dim - 1][dim - 2] = 6.0;
+    for (size_t i = 1; i < dim - 1; i++){
+        matrix[i][i] = 8.0;
+        matrix[i][i + 1] = 1.0;
+        matrix[i][i - 1] = 6.0;
+    }
+
+    
+    std::vector<std::vector<double>> matrix2(dim);
+    for (size_t i = 0; i < dim; i++){
+        matrix2[i].resize(dim, 0.0);
+    }
+    matrix2[0][0] = 8.0;
+    matrix2[0][1] = 6.0;
+    matrix2[dim - 1][dim - 1] = 8.0;
+    matrix2[dim - 1][dim - 2] = 1.0;
+    for (size_t i = 1; i < dim - 1; i++){
+        matrix2[i][i] = 8.0;
+        matrix2[i][i + 1] = 6.0;
+        matrix2[i][i - 1] = 1.0;
+    }
+    
+    std::vector<double> l(dim);
+    for (size_t i = 0; i < dim; i++){
+        l[i] = 1.0;
+    }
+
+    findCanonicalFormRelaxation(matrix, l, C, firstVec, 1.0);
+    double otv = normOfMatrix(C, INFINITY);
+    findCanonicalFormRelaxation(matrix2, l, C, firstVec, 1.0);
+    double otv2 = normOfMatrix(C, INFINITY);
     return 0;
 }
